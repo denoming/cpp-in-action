@@ -1,0 +1,1 @@
+option(PROJECT_ENABLE_TESTS "Enable testing" ON)
