@@ -183,8 +183,10 @@ get(const Customer& c)
 TEST(StructuredBindingTest, ProvideTupleLikeApi)
 {
     Customer c{"Tim", "Starr", 42};
-    auto [f, l, v] = c;
+    auto& [f, l, v] = c;
     EXPECT_EQ(f, "Tim");
     EXPECT_EQ(l, "Starr");
     EXPECT_EQ(v, 42);
+    v = 30;
+    EXPECT_EQ(c.value(), 30);
 }
