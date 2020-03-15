@@ -6,6 +6,8 @@ set(TARGET_NAME "Tests")
 
 set(TARGET_SOURCE
         ${TARGET_PATH}/src/StructuredBindingTest.cpp
+        ${TARGET_PATH}/src/EmbeddedInitTest.cpp
+        ${TARGET_PATH}/src/AggreagateExtensionTest.cpp
     )
 
 #-------------------------------------------------------------------------------
@@ -21,6 +23,8 @@ target_sources(${TARGET_NAME}
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
-        GTest::GTest
-        GTest::Main
+        GTest::gtest
+        GTest::gtest_main
+        GTest::gmock
+        GTest::gmock_main
     )

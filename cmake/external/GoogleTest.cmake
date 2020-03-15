@@ -1,8 +1,25 @@
 list(APPEND CMAKE_PREFIX_PATH "~/opt/googletest")
-find_package(GTest REQUIRED)
 
-if(${GTEST_FOUND})
-    message(STATUS "Using GTest ${GTEST_LIBRARIES} library")
+find_package(GTest CONFIG REQUIRED)
+
+if (TARGET GTest::gtest)
+    get_property(GTEST_LOCATION
+        TARGET
+            GTest::gtest
+        PROPERTY
+            LOCATION)
+    message(STATUS "Using GTest "${GTEST_LOCATION}" library")
 else()
     message(FATAL_ERROR "GTest library NOT found")
+endif()
+
+if (TARGET GTest::gmock)
+    get_property(GMOCK_LOCATION
+        TARGET
+            GTest::gmock
+        PROPERTY
+            LOCATION)
+    message(STATUS "Using GMock "${GMOCK_LOCATION}" library")
+else()
+    message(FATAL_ERROR "GMock library NOT found")
 endif()
