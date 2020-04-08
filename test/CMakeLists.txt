@@ -10,6 +10,7 @@ set(TARGET_SOURCE
         ${TARGET_PATH}/src/general/AggreagateExtensionTest.cpp
         ${TARGET_PATH}/src/general/CopyElisionTest.cpp
         ${TARGET_PATH}/src/general/LambdaExtensionTest.cpp
+        ${TARGET_PATH}/src/general/RelaxedEnumTest.cpp
     )
 
 #-------------------------------------------------------------------------------
