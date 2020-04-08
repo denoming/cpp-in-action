@@ -18,4 +18,5 @@ SortIncludes: false
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: true
 SpacesInContainerLiterals: false
+SpaceAfterTemplateKeyword: false
 ...
