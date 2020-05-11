@@ -8,7 +8,7 @@ if (TARGET GTest::gtest)
             GTest::gtest
         PROPERTY
             LOCATION)
-    message(STATUS "Found GTest :${GTEST_LOCATION}")
+    message(STATUS "Found GTest: ${GTEST_LOCATION}")
 else()
     message(FATAL_ERROR "GTest library NOT found")
 endif()
@@ -19,7 +19,7 @@ if (TARGET GTest::gmock)
             GTest::gmock
         PROPERTY
             LOCATION)
-    message(STATUS "Found GMock :${GMOCK_LOCATION}")
+    message(STATUS "Found GMock: ${GMOCK_LOCATION}")
 else()
     message(FATAL_ERROR "GMock library NOT found")
 endif()
