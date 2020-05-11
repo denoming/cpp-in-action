@@ -18,7 +18,7 @@ struct DataEx : Data {
 
 TEST(AggreagateExtensionTest, DefaultInit1)
 {
-    DataEx ex1{"Text", 0.5, true};
+    DataEx ex1{{"Text", 0.5}, true};
     EXPECT_EQ(ex1.name, "Text");
     EXPECT_NEAR(ex1.value, 0.5, 0.1);
     EXPECT_TRUE(ex1.done);
@@ -52,7 +52,7 @@ TEST(AggreagateExtensionTest, DefaultInit2)
     EXPECT_EQ(unit1.someValue3, 15);
     EXPECT_EQ(unit1.someValue4, 5);
 
-    Unit unit2{1.5, true, 30, 10};
+    Unit unit2{{1.5}, {true}, 30, 10};
     EXPECT_NEAR(unit2.someValue1, 1.5, 0.1);
     EXPECT_TRUE(unit2.someValue2);
     EXPECT_EQ(unit2.someValue3, 30);
