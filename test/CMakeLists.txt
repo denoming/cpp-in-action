@@ -6,7 +6,7 @@ set(TARGET_NAME "Tests")
 
 set(TARGET_SOURCE
         ${TARGET_PATH}/src/general/StructuredBindingTest.cpp
-        ${TARGET_PATH}/src/general/EmbeddedInitTest.cpp
+        ${TARGET_PATH}/src/general/IfAndSwitchWithInitTest.cpp
         ${TARGET_PATH}/src/general/AggreagateExtensionTest.cpp
         ${TARGET_PATH}/src/general/CopyElisionTest.cpp
         ${TARGET_PATH}/src/general/LambdaExtensionTest.cpp

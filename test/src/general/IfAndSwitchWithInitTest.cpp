@@ -5,7 +5,7 @@
 #include <map>
 #include <filesystem>
 
-TEST(EmbeddedInitTest, InsertWithCheck)
+TEST(IfAndSwitchWithInitTest, InsertWithCheck)
 {
     std::map<std::string, unsigned> coll;
     coll.insert({"New", 42});
@@ -17,7 +17,7 @@ TEST(EmbeddedInitTest, InsertWithCheck)
     FAIL() << "Not expected";
 }
 
-TEST(EmbeddedInitTest, Switch)
+TEST(IfAndSwitchWithInitTest, Switch)
 {
     namespace fs = std::filesystem;
     switch (fs::path p{"/tmp"}; status(p).type()) {
