@@ -22,7 +22,7 @@ public:
     }
 
     [[deprecated]] std::thread // Use 'deprecated' attribute
-    startThreadWithCopyOfThis(int timeout)
+    startThreadWithCopyOfThis([[maybe_unused]] int timeout)
     {
         return std::thread{};
     }

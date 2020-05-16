@@ -11,6 +11,8 @@ set(TARGET_SOURCE
         ${TARGET_PATH}/src/general/CopyElisionTest.cpp
         ${TARGET_PATH}/src/general/LambdaExtensionTest.cpp
         ${TARGET_PATH}/src/general/MinorFeaturesTest.cpp
+        ${TARGET_PATH}/src/general/TemplateClassDeduction.cpp
+        ${TARGET_PATH}/src/general/DeductionGuide.cpp
     )
 
 #-------------------------------------------------------------------------------

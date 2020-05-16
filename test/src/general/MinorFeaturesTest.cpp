@@ -29,11 +29,11 @@ TEST(MinorFeaturesTest, RelaxedEnum)
 
 TEST(MinorFeaturesTest, DirectlListInitialization)
 {
-    auto a1{1}; // <= OK (int)
+    [[maybe_unused]] auto a1{1}; // <= OK (int)
     // auto b1{1, 2, 3};    <= Error in C++17
 
-    auto a2 = 1;         // <= OK (int)
-    auto b2 = {1, 2, 3}; // <= std::initializer_list<int>
+    [[maybe_unused]] auto a2 = 1;         // <= OK (int)
+    [[maybe_unused]] auto b2 = {1, 2, 3}; // <= std::initializer_list<int>
 }
 
 //-----------------------------------------------------------------------------
@@ -76,6 +76,6 @@ private:
 
 TEST(MinorFeaturesTest, StaticAssertWithSingleArgument)
 {
-    C<int> c1;
+    [[maybe_unused]] C<int> c1;
     // C<NotDefaultConstructible> c2; <= Failed to compile due static assert
 }
