@@ -55,6 +55,18 @@ printBySpace(T&& v, Args&&... args)
     std::cout << std::endl;
 }
 
+template<auto Sep = ' ', typename T, typename... Args>
+void
+printBy(T&& v, Args&&... args)
+{
+    std::cout << std::forward<T>(v);
+    auto outWithSep = [](auto&& arg) {
+        std::cout << Sep << arg;
+    };
+    (..., outWithSep(std::forward<Args>(args)));
+    std::cout << std::endl;
+}
+
 /**
  * Combine hash for multiple given values
  */
@@ -90,9 +102,16 @@ TEST(FoldExpression, Mul)
     EXPECT_EQ(mul(), 1); // We can pass an empty parameter pack
 }
 
-TEST(FoldExpression, Print)
+TEST(FoldExpression, PrintBySpace)
 {
     printBySpace("Hello", "world", "!");
+    EXPECT_TRUE(true);
+}
+
+TEST(FoldExpression, PrintBy)
+{
+    static const char SEP[] = ", ";
+    printBy<SEP>("Hello", "world", "!");
     EXPECT_TRUE(true);
 }
 
