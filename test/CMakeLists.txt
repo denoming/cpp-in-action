@@ -15,6 +15,7 @@ set(TARGET_SOURCE
         ${TARGET_PATH}/src/general/DeductionGuide.cpp
         ${TARGET_PATH}/src/general/CompileTimeIf.cpp
         ${TARGET_PATH}/src/general/FoldExpression.cpp
+        ${TARGET_PATH}/src/general/ExtendedUsingDeclaration.cpp
     )
 
 #-------------------------------------------------------------------------------
