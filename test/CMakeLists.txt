@@ -16,6 +16,8 @@ set(TARGET_SOURCE
         ${TARGET_PATH}/src/general/CompileTimeIf.cpp
         ${TARGET_PATH}/src/general/FoldExpression.cpp
         ${TARGET_PATH}/src/general/ExtendedUsingDeclaration.cpp
+        ${TARGET_PATH}/src/general/OptionalTest.cpp
+        ${TARGET_PATH}/src/general/VariantTest.cpp
     )
 
 #-------------------------------------------------------------------------------
