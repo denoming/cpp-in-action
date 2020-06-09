@@ -56,8 +56,7 @@ private:
 template<typename... Ts>
 class Multi : Base<Ts>... {
 public:
-    using Base<Ts>::Base...;      /// derive all constructors
-    using Base<Ts>::operator=...; /// derive all assignment operators
+    using Base<Ts>::Base...; /// derive all constructors
 };
 
 TEST(ExtendedUsingDeclaration, VariadicUsingForInheritingConstructors)
