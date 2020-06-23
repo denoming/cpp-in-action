@@ -20,7 +20,3 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectDependencies.cmake)
 #-------------------------------------------------------------------------------
 
 add_subdirectory(src)
-if(PROJECT_ENABLE_TESTS)
-    add_subdirectory(test)
-endif()
-
