@@ -10,10 +10,8 @@ project(mcpp)
 # Project Configuration
 #-------------------------------------------------------------------------------
 
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectConfiguration.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectOptions.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectResources.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectDependencies.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectConfigs.cmake)
 
 #-------------------------------------------------------------------------------
 # Structure Configuration
