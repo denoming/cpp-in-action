@@ -24,6 +24,7 @@ PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/general/StructuredBindingTest.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/general/TemplateClassDeductionTest.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/general/VariantTest.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/general/StringSearchTest.cpp"
 )
 
 target_include_directories(${TARGET}
