@@ -1,6 +1,5 @@
 include(GoogleTest)
 
-message(STATUS GTEST_ROOT=${GTEST_ROOT})
 if(DEFINED ENV{GTEST_ROOT})
     list(APPEND CMAKE_PREFIX_PATH $ENV{GTEST_ROOT})
 endif()

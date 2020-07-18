@@ -47,7 +47,7 @@ struct Person {
 
 using Persons = std::list<Person>;
 
-TEST(TemplateClassDeduction, LambdaWrapper)
+TEST(TemplateClassDeductionTest, LambdaWrapper)
 {
     // clang-format off
     Persons persons{

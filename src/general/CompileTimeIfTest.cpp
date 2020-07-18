@@ -15,7 +15,7 @@ decltype(auto) call(C c, Args&&... args)
     }
 }
 
-TEST(CompileTimeIf, Test1)
+TEST(CompileTimeIfTest, Test1)
 {
     auto vCall = [] (std::string message) -> void {
         std::cout << "Message: " << message << std::endl;

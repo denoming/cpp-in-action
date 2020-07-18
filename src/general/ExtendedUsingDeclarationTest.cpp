@@ -19,7 +19,7 @@ struct overload : Ts... //! Inherit all function call operator from variadic lis
 template<typename... Ts>
 overload(Ts...)->overload<Ts...>;
 
-TEST(ExtendedUsingDeclaration, VariadicUsingDeclarations)
+TEST(ExtendedUsingDeclarationTest, VariadicUsingDeclarations)
 {
     using Variant = std::variant<int, long, double, std::string>;
     std::vector<Variant> values = {10, 15l, 1.5, "hello"};
@@ -59,7 +59,7 @@ public:
     using Base<Ts>::Base...; /// derive all constructors
 };
 
-TEST(ExtendedUsingDeclaration, VariadicUsingForInheritingConstructors)
+TEST(ExtendedUsingDeclarationTest, VariadicUsingForInheritingConstructors)
 {
     using MultiType = Multi<int, std::string, bool>;
     MultiType m1 = 42;

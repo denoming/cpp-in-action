@@ -35,7 +35,7 @@ struct Pair {
 template<typename T1, typename T2>
 Pair(T1, T2)->Pair<T1, T2>;
 
-TEST(DeductionGuide, TemplateDeductionGuide)
+TEST(DeductionGuideTest, TemplateDeductionGuide)
 {
     Pair pair{"Value1", "Value2"};
     EXPECT_EQ(pair.value1, "Value1");
@@ -56,7 +56,7 @@ struct Data {
  */
 Data(const char*)->Data<std::string>;
 
-TEST(DeductionGuide, NonTemplateDeductionGuide)
+TEST(DeductionGuideTest, NonTemplateDeductionGuide)
 {
     Data d{"Text"};
     EXPECT_THAT(d.value, TypedEq<std::string>(std::string{"Text"}));
@@ -78,7 +78,7 @@ struct A {
 A(int)->A<int>;
 A(const char*)->A<std::string>;
 
-TEST(DeductionGuide, DeductionGuideForSimpleAggregate)
+TEST(DeductionGuideTest, DeductionGuideForSimpleAggregate)
 {
     A a{"Text"};
     EXPECT_THAT(a.value, TypedEq<std::string>(std::string{"Text"}));
@@ -100,7 +100,7 @@ struct B {
 template<typename It>
 B(It, It)->B<typename std::iterator_traits<It>::value_type>;
 
-TEST(DeductionGuide, DeductionGuideWithIterator)
+TEST(DeductionGuideTest, DeductionGuideWithIterator)
 {
     std::set<int> values;
     values.insert(1);

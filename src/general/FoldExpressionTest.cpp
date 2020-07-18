@@ -86,36 +86,36 @@ hashCombine(const Types&... args)
     return seed;
 }
 
-TEST(FoldExpression, Sum)
+TEST(FoldExpressionTest, Sum)
 {
     EXPECT_EQ(sum(1, 2, 3), 6);
 }
 
-TEST(FoldExpression, Sub)
+TEST(FoldExpressionTest, Sub)
 {
     EXPECT_EQ(sub(3, 2, 1), 2);
 }
 
-TEST(FoldExpression, Mul)
+TEST(FoldExpressionTest, Mul)
 {
     EXPECT_EQ(mul(1, 2, 3), 6);
     EXPECT_EQ(mul(), 1); // We can pass an empty parameter pack
 }
 
-TEST(FoldExpression, PrintBySpace)
+TEST(FoldExpressionTest, PrintBySpace)
 {
     printBySpace("Hello", "world", "!");
     EXPECT_TRUE(true);
 }
 
-TEST(FoldExpression, PrintBy)
+TEST(FoldExpressionTest, PrintBy)
 {
     static const char SEP[] = ", ";
     printBy<SEP>("Hello", "world", "!");
     EXPECT_TRUE(true);
 }
 
-TEST(FoldExpression, HashCombine)
+TEST(FoldExpressionTest, HashCombine)
 {
     EXPECT_NE(hashCombine("Hi"s, "World"s, 42), 0);
 }

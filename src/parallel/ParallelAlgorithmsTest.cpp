@@ -25,7 +25,7 @@ struct Data {
     double sqrt;
 };
 
-TEST(ParallelAlgorithms, ForEach)
+TEST(ParallelAlgorithmsTest, ForEach)
 {
     constexpr int NumOfElements = 1'000'000;
 
@@ -50,7 +50,7 @@ TEST(ParallelAlgorithms, ForEach)
     EXPECT_THAT(elems, Each(Field(&Data::sqrt, Ne(0.0))));
 }
 
-TEST(ParallelAlgorithms, DISABLED_Path)
+TEST(ParallelAlgorithmsTest, DISABLED_Path)
 {
     static const fs::path root{"<path>"};
     EXPECT_NO_THROW({
