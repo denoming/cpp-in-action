@@ -19,4 +19,5 @@ SortUsingDeclarations: false
 SpaceAfterCStyleCast: true
 SpacesInContainerLiterals: false
 SpaceAfterTemplateKeyword: false
+ColumnLimit: 100
 ...
