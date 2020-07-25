@@ -10,24 +10,24 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
 PRIVATE
-    "${CMAKE_CURRENT_LIST_DIR}/general/AggreagateExtensionTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/CompileTimeIfTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/CopyElisionTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/DeductionGuideTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/ExtendedUsingDeclarationTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/FileSystemTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/FoldExpressionTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/IfAndSwitchWithInitTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/LambdaExtensionTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/MinorFeaturesTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/OptionalTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/StructuredBindingTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/TemplateClassDeductionTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/VariantTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/StringSearchTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/UtilityFunctionsTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/ContainerImprovementsTest.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/general/UncaughtExceptionTest.cpp"
+    "general/AggreagateExtensionTest.cpp"
+    "general/CompileTimeIfTest.cpp"
+    "general/CopyElisionTest.cpp"
+    "general/DeductionGuideTest.cpp"
+    "general/ExtendedUsingDeclarationTest.cpp"
+    "general/FileSystemTest.cpp"
+    "general/FoldExpressionTest.cpp"
+    "general/IfAndSwitchWithInitTest.cpp"
+    "general/LambdaExtensionTest.cpp"
+    "general/MinorFeaturesTest.cpp"
+    "general/OptionalTest.cpp"
+    "general/StructuredBindingTest.cpp"
+    "general/TemplateClassDeductionTest.cpp"
+    "general/VariantTest.cpp"
+    "general/StringSearchTest.cpp"
+    "general/UtilityFunctionsTest.cpp"
+    "general/ContainerImprovementsTest.cpp"
+    "general/UncaughtExceptionTest.cpp"
 )
 
 target_include_directories(${TARGET}
@@ -47,7 +47,7 @@ if(MCPP_ENABLE_PARALLEL)
 
     target_sources(${TARGET}
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/parallel/ParallelAlgorithmsTest.cpp"
+        "parallel/ParallelAlgorithmsTest.cpp"
     )
 endif()
 
