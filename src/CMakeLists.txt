@@ -27,6 +27,7 @@ PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/general/StringSearchTest.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/general/UtilityFunctionsTest.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/general/ContainerImprovementsTest.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/general/UncaughtExceptionTest.cpp"
 )
 
 target_include_directories(${TARGET}
