@@ -2,13 +2,11 @@
 
 #include <variant>
 
-template<typename... Ts>
-struct overload : Ts... {
+template<typename... Ts> struct overload : Ts... {
     using Ts::operator()...;
 };
 
-template<typename... Ts>
-overload(Ts...)->overload<Ts...>;
+template<typename... Ts> overload(Ts...) -> overload<Ts...>;
 
 TEST(VariantTest, Monostate)
 {

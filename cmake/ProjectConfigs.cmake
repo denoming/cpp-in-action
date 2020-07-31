@@ -16,6 +16,7 @@ if(MCPP_ENABLE_TESTS)
 endif()
 
 if(MCPP_ENABLE_PARALLEL)
+    find_package(Threads REQUIRED)
     find_package(TBB REQUIRED)
 endif()
 
