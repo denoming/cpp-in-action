@@ -22,6 +22,7 @@ PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/UtilityFunctionsTest.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ContainerImprovementsTest.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/UncaughtExceptionTest.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/PolymorphicMemoryTest.cpp"
 )
 
 target_link_libraries(${TARGET}

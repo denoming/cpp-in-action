@@ -5,12 +5,15 @@ add_library("${PROJECT_NAME}::common" ALIAS ${TARGET})
 
 target_sources(${TARGET}
 PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/common/HeapMemoryTracker.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/common/Timer.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/common/MemoryResourcesTracker.hpp"
+PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/HeapMemoryTracker.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryResourcesTracker.cpp"
 )
 
 target_include_directories(${TARGET}
 PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
-
-set_target_properties(${TARGET} PROPERTIES LINKER_LANGUAGE CXX)
