@@ -23,6 +23,7 @@ PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ContainerImprovements.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/UncaughtException.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/PolymorphicMemory.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/CompareFloatNumbers.cpp"
 )
 
 target_link_libraries(${TARGET}
