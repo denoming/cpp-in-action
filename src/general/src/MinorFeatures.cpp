@@ -48,7 +48,7 @@ TEST(MinorFeaturesTest, HexadecimalFloatingPointLiterals)
 
 TEST(MinorFeaturesTest, Utf8CharacterLiterals)
 {
-    std::string s = u8"ᴥ";
+    std::u8string s = u8"ᴥ";
     EXPECT_THAT(s, SizeIs(Gt(1)));
 }
 

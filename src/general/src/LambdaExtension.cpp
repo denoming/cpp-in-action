@@ -11,7 +11,7 @@ public:
     {
     }
 
-    [[nodiscard]] std::thread // Use 'nodiscard' attribute, which warn if you miss return value
+    [[nodiscard]] std::thread // Using 'nodiscard' attribute, which warn if you miss return value
     startThreadWithCopyOfThis()
     {
         using namespace std::literals;
@@ -21,7 +21,7 @@ public:
         });
     }
 
-    [[deprecated]] std::thread // Use 'deprecated' attribute
+    [[deprecated]] std::thread // Using 'deprecated' attribute (warn if you trying to use it)
     startThreadWithCopyOfThis([[maybe_unused]] int timeout)
     {
         return std::thread{};
@@ -38,15 +38,6 @@ TEST(LambdaExtensionTest, CopyOfThis)
         Data d{"Denys"};
         t = d.startThreadWithCopyOfThis();
     }
-    if (t.joinable()) {
-        t.join();
-    }
-}
-
-TEST(LambdaExtensionTest, CopyOfThisDeprecated)
-{
-    Data d{"Denys"};
-    std::thread t = d.startThreadWithCopyOfThis(0);
     if (t.joinable()) {
         t.join();
     }
