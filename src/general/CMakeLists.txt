@@ -24,6 +24,7 @@ PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/UncaughtException.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/PolymorphicMemory.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/CompareFloatNumbers.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/NewDeleteOperators.cpp"
 )
 
 target_link_libraries(${TARGET}

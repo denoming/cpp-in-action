@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-redundant-declaration"
 #pragma once
 
 #include <new>
@@ -13,13 +15,16 @@ public:
     reset();
 
     static void
-    trace(bool b);
+    trace(bool enable);
 
     static void
     status();
 
     static void*
     allocate(std::size_t size, std::size_t align, const char* call);
+
+    static void
+    deallocate(void* p, const char* call);
 
     static size_t
     allocNumber();
@@ -45,25 +50,39 @@ private:
 operator new(std::size_t size);
 
 [[nodiscard]] extern void*
-operator new(std::size_t size, std::align_val_t align);
+operator new[](std::size_t size);
 
 [[nodiscard]] extern void*
-operator new[](std::size_t size);
+operator new(std::size_t size, std::align_val_t align);
 
 [[nodiscard]] extern void*
 operator new[](std::size_t size, std::align_val_t align);
 
 /** ============================================ */
-/** Override global memory deallocation function */
+/** Override global memory de-allocation function */
 
 extern void
 operator delete(void* p) noexcept;
 
 extern void
+operator delete[](void* p) noexcept;
+
+extern void
 operator delete(void* p, std::size_t) noexcept;
+
+extern void
+operator delete[](void* p, std::size_t) noexcept;
 
 extern void
 operator delete(void* p, std::align_val_t) noexcept;
 
 extern void
+operator delete[](void* p, std::align_val_t) noexcept;
+
+extern void
 operator delete(void* p, std::size_t, std::align_val_t align) noexcept;
+
+extern void
+operator delete[](void* p, std::size_t, std::align_val_t align) noexcept;
+
+#pragma clang diagnostic pop

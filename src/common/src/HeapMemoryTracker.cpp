@@ -8,9 +8,9 @@ HeapMemoryTracker::reset()
 }
 
 void
-HeapMemoryTracker::trace(bool b)
+HeapMemoryTracker::trace(bool enable)
 {
-    _doTrace = b;
+    _doTrace = enable;
 }
 
 void
@@ -55,6 +55,22 @@ HeapMemoryTracker::allocate(std::size_t size, std::size_t align, const char* cal
     return p;
 }
 
+void
+HeapMemoryTracker::deallocate(void* p, const char* call)
+{
+    if (_doTrace) {
+        printf("%s => %p\n", call, static_cast<void*>(p));
+    }
+
+#ifdef _MSC_VER
+    /** Use specific method to deallocate over-aligned memory (Windows API) */
+    _aligned_free(p);
+#else
+    // C++17 API
+    std::free(p);
+#endif
+}
+
 size_t
 HeapMemoryTracker::allocNumber()
 {
@@ -74,15 +90,15 @@ operator new(std::size_t size)
 }
 
 [[nodiscard]] void*
-operator new(std::size_t size, std::align_val_t align)
-{
-    return HeapMemoryTracker::allocate(size, static_cast<size_t>(align), "::new aligned");
-}
-
-[[nodiscard]] void*
 operator new[](std::size_t size)
 {
     return HeapMemoryTracker::allocate(size, 0, "::new[]");
+}
+
+[[nodiscard]] void*
+operator new(std::size_t size, std::align_val_t align)
+{
+    return HeapMemoryTracker::allocate(size, static_cast<size_t>(align), "::new aligned");
 }
 
 [[nodiscard]] void*
@@ -94,29 +110,47 @@ operator new[](std::size_t size, std::align_val_t align)
 void
 operator delete(void* p) noexcept
 {
-    std::free(p);
+    HeapMemoryTracker::deallocate(p, "::delete");
+}
+
+void
+operator delete[](void* p) noexcept
+{
+    HeapMemoryTracker::deallocate(p, "::delete[]");
 }
 
 void
 operator delete(void* p, std::size_t) noexcept
 {
-    ::operator delete(p);
+    HeapMemoryTracker::deallocate(p, "::delete sized");
+}
+
+void
+operator delete[](void* p, std::size_t) noexcept
+{
+    HeapMemoryTracker::deallocate(p, "::delete[] sized");
 }
 
 void
 operator delete(void* p, std::align_val_t) noexcept
 {
-#ifdef _MSC_VER
-    /** Use specific method to deallocate over-aligned memory (Windows API) */
-    _aligned_free(p);
-#else
-    // C++17 API
-    std::free(p);
-#endif
+    HeapMemoryTracker::deallocate(p, "::delete aligned");
 }
 
 void
-operator delete(void* p, std::size_t, std::align_val_t align) noexcept
+operator delete[](void* p, std::align_val_t) noexcept
 {
-    ::operator delete(p, align);
+    HeapMemoryTracker::deallocate(p, "::delete[] aligned");
+}
+
+void
+operator delete(void* p, std::size_t, std::align_val_t) noexcept
+{
+    HeapMemoryTracker::deallocate(p, "::delete sized aligned");
+}
+
+void
+operator delete[](void* p, std::size_t, std::align_val_t) noexcept
+{
+    HeapMemoryTracker::deallocate(p, "::delete[] sized aligned");
 }
