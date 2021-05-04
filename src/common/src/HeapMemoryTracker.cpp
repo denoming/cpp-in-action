@@ -34,7 +34,7 @@ HeapMemoryTracker::allocate(std::size_t size, std::size_t align, const char* cal
         p = _aligned_malloc(size, align);
 #else
         /** Use specific method to allocate over-aligned memory (C++17 API) */
-        p = std::aligned_alloc(align, size);
+        p = std::aligned_alloc(align, align * size /* an integral multiple of alignment */);
 #endif
     }
 
