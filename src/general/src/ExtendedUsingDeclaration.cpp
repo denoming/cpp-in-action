@@ -8,7 +8,8 @@
 template<typename... Ts>
 struct overload : Ts... //! Inherit all function call operator from variadic list of classes
 {
-    //! Without using declaration we will have ambiguous (two different overload of the same member function)
+    //! Without using declaration we will have ambiguous (two different overload of the same member
+    //! function)
     using Ts::operator()...;
 };
 
@@ -17,7 +18,7 @@ struct overload : Ts... //! Inherit all function call operator from variadic lis
  * (base types are deduced from passed arguments)
  */
 template<typename... Ts>
-overload(Ts...)->overload<Ts...>;
+overload(Ts...) -> overload<Ts...>;
 
 TEST(ExtendedUsingDeclarationTest, VariadicUsingDeclarations)
 {

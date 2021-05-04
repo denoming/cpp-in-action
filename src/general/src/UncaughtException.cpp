@@ -27,8 +27,7 @@ public:
     {
         if (std::uncaught_exceptions() > initialUncaught) {
             rollback();
-        }
-        else {
+        } else {
             commit();
         }
     }
@@ -55,8 +54,7 @@ TEST(UncaughtExceptionTest, Dummy2)
     try {
         Request r1{commits, rollbacks};
         throw std::runtime_error{""};
-    }
-    catch (...) {
+    } catch (...) {
         Request r2{commits, rollbacks};
     }
 

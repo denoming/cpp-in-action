@@ -86,8 +86,8 @@ TEST(UtilityFunctionsTest, SampleValues)
 
     std::random_device rd;
     std::vector<int> output;
-    std::sample(input.cbegin(), input.cend(), std::back_insert_iterator{output}, 10,
-                std::mt19937{rd()});
+    std::sample(
+        input.cbegin(), input.cend(), std::back_insert_iterator{output}, 10, std::mt19937{rd()});
 
     EXPECT_THAT(output, Not(IsEmpty()));
 }

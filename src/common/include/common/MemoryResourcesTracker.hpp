@@ -8,8 +8,9 @@ public:
     explicit MemoryResourcesTracker(std::pmr::memory_resource* upstream
                                     = std::pmr::get_default_resource());
 
-    explicit MemoryResourcesTracker(std::string prefix, std::pmr::memory_resource* upstream
-                                                        = std::pmr::get_default_resource());
+    explicit MemoryResourcesTracker(std::string prefix,
+                                    std::pmr::memory_resource* upstream
+                                    = std::pmr::get_default_resource());
 
     void
     trace(bool enabled);

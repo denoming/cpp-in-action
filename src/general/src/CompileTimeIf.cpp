@@ -5,23 +5,21 @@
 #include <type_traits>
 
 template<typename C, typename... Args>
-decltype(auto) call(C c, Args&&... args)
+decltype(auto)
+call(C c, Args&&... args)
 {
     if constexpr (std::is_void_v<std::invoke_result<C, Args...>>) {
         c(std::forward<Args>(args)...);
-    }
-    else {
+    } else {
         return c(std::forward<Args>(args)...);
     }
 }
 
 TEST(CompileTimeIfTest, Test1)
 {
-    auto vCall = [] (std::string message) -> void {
-        std::cout << "Message: " << message << std::endl;
-    };
+    auto vCall = [](std::string message) { std::cout << "Message: " << message << std::endl; };
 
-    auto nCall = [] (std::string message) -> int {
+    auto nCall = [](std::string message) -> int {
         std::cout << "Message: " << message << std::endl;
         return 0;
     };

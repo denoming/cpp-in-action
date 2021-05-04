@@ -10,7 +10,8 @@ using namespace testing;
  *  - inherits all lambdas
  *  - uses lambda's call operator (make them as subject of overload resolution)
  */
-template<typename... Ts> struct overload : Ts... {
+template<typename... Ts>
+struct overload : Ts... {
     using Ts::operator()...;
 };
 
@@ -18,7 +19,8 @@ template<typename... Ts> struct overload : Ts... {
  * Deduction guide for overload helper
  * (all given objects types given in ctor initialize variadic template)
  */
-template<typename... Ts> overload(Ts...) -> overload<Ts...>;
+template<typename... Ts>
+overload(Ts...) -> overload<Ts...>;
 
 struct SimpleLabel {
     [[nodiscard]] std::string
@@ -70,8 +72,7 @@ TEST(VariantTest, Twice)
         if constexpr (std::is_convertible_v<decltype(val), std::string>) {
             // Concatenation for strings
             val += val;
-        }
-        else {
+        } else {
             // Multiple by for numbers
             val *= 2;
         }

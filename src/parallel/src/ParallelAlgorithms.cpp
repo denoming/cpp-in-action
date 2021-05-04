@@ -62,9 +62,10 @@ TEST(ParallelAlgorithmsTest, DISABLED_Path)
             }
         });
 
-        auto size = std::transform_reduce(files.begin(), files.end(), std::uintmax_t{0}, std::plus{}, [](const fs::path& p) {
-            return fs::file_size(p);
-        });
+        auto size = std::transform_reduce(
+            files.begin(), files.end(), std::uintmax_t{0}, std::plus{}, [](const fs::path& p) {
+                return fs::file_size(p);
+            });
 
         EXPECT_THAT(size, Ne(0));
     });

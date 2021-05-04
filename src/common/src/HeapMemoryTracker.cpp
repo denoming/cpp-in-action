@@ -28,8 +28,7 @@ HeapMemoryTracker::allocate(std::size_t size, std::size_t align, const char* cal
     if (align == 0) {
         /** Use default way to allocate memory */
         p = std::malloc(size);
-    }
-    else {
+    } else {
 #ifdef _MSC_VER
         /** Use specific method to allocate over-aligned memory (Windows API) */
         p = _aligned_malloc(size, align);
@@ -45,8 +44,7 @@ HeapMemoryTracker::allocate(std::size_t size, std::size_t align, const char* cal
         printf("(%zu bytes, ", size);
         if (align > 0) {
             printf("%zu-byte aligned) ", align);
-        }
-        else {
+        } else {
             printf("non-aligned) ");
         }
         printf("=> %p (total: %zu bytes)\n", static_cast<void*>(p), _allocSize);

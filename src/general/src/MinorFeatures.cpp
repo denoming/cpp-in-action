@@ -10,13 +10,7 @@ using ::testing::DoubleNear;
 
 TEST(MinorFeaturesTest, RelaxedEnum)
 {
-    enum class Weekday { mon = 1,
-                         tue,
-                         wed,
-                         thu,
-                         fri,
-                         sat,
-                         sun };
+    enum class Weekday { mon = 1, tue, wed, thu, fri, sat, sun };
     Weekday e1{1};
     EXPECT_EQ(e1, Weekday::mon);
     Weekday e2{5};

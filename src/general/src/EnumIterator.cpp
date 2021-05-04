@@ -5,7 +5,8 @@
 
 using namespace testing;
 
-template<typename T, T... args> class EnumIterator {
+template<typename T, T... args>
+class EnumIterator {
 public:
     static constexpr T Values[] = {args...};
     static constexpr std::size_t Size = sizeof...(args);
@@ -73,7 +74,8 @@ private:
     difference_type _p;
 };
 
-template<typename T, T... args> struct EnumRange {
+template<typename T, T... args>
+struct EnumRange {
     static EnumIterator<T, args...>
     begin()
     {

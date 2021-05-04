@@ -139,11 +139,9 @@ get(Customer&& c)
     static_assert(I < 3);
     if constexpr (I == 0) {
         return std::move(c.firstName());
-    }
-    else if constexpr (I == 1) {
+    } else if constexpr (I == 1) {
         return std::move(c.lastName());
-    }
-    else /* I == 2 */ {
+    } else /* I == 2 */ {
         return std::move(c.value());
     }
 }
@@ -155,11 +153,9 @@ get(Customer& c)
     static_assert(I < 3);
     if constexpr (I == 0) {
         return c.firstName();
-    }
-    else if constexpr (I == 1) {
+    } else if constexpr (I == 1) {
         return c.lastName();
-    }
-    else /* I == 2 */ {
+    } else /* I == 2 */ {
         return c.value();
     }
 }
@@ -171,11 +167,9 @@ get(const Customer& c)
     static_assert(I < 3);
     if constexpr (I == 0) {
         return c.firstName();
-    }
-    else if constexpr (I == 1) {
+    } else if constexpr (I == 1) {
         return c.lastName();
-    }
-    else /* I == 2 */ {
+    } else /* I == 2 */ {
         return c.value();
     }
 }

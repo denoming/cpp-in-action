@@ -10,7 +10,8 @@ TEST(StringSearchTest, BoyerMooreSearcherForString)
     const std::string target{"Et"};
 
     std::boyer_moore_searcher bm{
-        target.cbegin(), target.cend(),
+        target.cbegin(),
+        target.cend(),
         /* Custom hash method */
         [](char ch) { return std::hash<char>{}(std::toupper(ch)); },
         /* Custom compare method */

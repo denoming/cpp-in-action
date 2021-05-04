@@ -33,8 +33,7 @@ testQuality(std::size_t total)
         std::floating_point auto actual = calculate(9.0f + target, 0.2f, 45);
         if (almostEqual(actual, target)) {
             ++count;
-        }
-        else {
+        } else {
             std::cout << std::setprecision(15) << actual << "!=" << target << std::endl;
         }
     }

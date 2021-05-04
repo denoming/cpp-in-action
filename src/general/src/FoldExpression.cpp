@@ -48,9 +48,7 @@ void
 printBySpace(T&& v, Args&&... args)
 {
     std::cout << std::forward<T>(v);
-    auto outWithSpace = [](auto&& arg) {
-        std::cout << ' ' << arg;
-    };
+    auto outWithSpace = [](auto&& arg) { std::cout << ' ' << arg; };
     (..., outWithSpace(std::forward<Args>(args)));
     std::cout << std::endl;
 }
@@ -60,9 +58,7 @@ void
 printBy(T&& v, Args&&... args)
 {
     std::cout << std::forward<T>(v);
-    auto outWithSep = [](auto&& arg) {
-        std::cout << Sep << arg;
-    };
+    auto outWithSep = [](auto&& arg) { std::cout << Sep << arg; };
     (..., outWithSep(std::forward<Args>(args)));
     std::cout << std::endl;
 }

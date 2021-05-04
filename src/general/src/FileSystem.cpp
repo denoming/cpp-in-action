@@ -12,28 +12,20 @@ TEST(FileSystemTest, ReadAccess)
 
     switch (fs::path p{"/etc/os-release"sv}; status(p).type()) {
     case fs::file_type::not_found:
-        std::clog
-            << "Path '" << p.string() << "' doesn't exists"
-            << std::endl;
+        std::clog << "Path '" << p.string() << "' doesn't exists" << std::endl;
         break;
     case fs::file_type::regular:
-        std::clog
-            << "File '" << p.string() << "' exists with "
-            << fs::file_size(p) << " bytes"
-            << std::endl;
+        std::clog << "File '" << p.string() << "' exists with " << fs::file_size(p) << " bytes"
+                  << std::endl;
         break;
     case fs::file_type::directory:
-        std::clog
-            << "'" << p.string() << "' is a directory containing: "
-            << std::endl;
+        std::clog << "'" << p.string() << "' is a directory containing: " << std::endl;
         for (auto& e : fs::directory_iterator(p)) {
             std::clog << "\t'" << e.path().string() << std::endl;
         }
         break;
     default:
-        std::clog
-            << "'" << p.string() << "' is special file"
-            << std::endl;
+        std::clog << "'" << p.string() << "' is special file" << std::endl;
     }
 }
 
@@ -59,9 +51,7 @@ TEST(FileSystemTest, WriteAccess)
     fs::create_directory_symlink("test"sv, testSubFolder.parent_path() / "slink");
 
     // List all content
-    std::clog << "Current path is '"
-              << fs::current_path().string() << "'"
-              << std::endl;
+    std::clog << "Current path is '" << fs::current_path().string() << "'" << std::endl;
     auto options{fs::directory_options::follow_directory_symlink};
     for (const auto& e : fs::recursive_directory_iterator("."sv, options)) {
         std::clog << "\t" << e.path().lexically_normal().string() << std::endl;

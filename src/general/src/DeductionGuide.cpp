@@ -33,7 +33,7 @@ struct Pair {
  * passed by value.
  */
 template<typename T1, typename T2>
-Pair(T1, T2)->Pair<T1, T2>;
+Pair(T1, T2) -> Pair<T1, T2>;
 
 TEST(DeductionGuideTest, TemplateDeductionGuide)
 {
@@ -54,7 +54,7 @@ struct Data {
  *  of template parameter instead of raw pointer when
  *  string literal was passed.
  */
-Data(const char*)->Data<std::string>;
+Data(const char*) -> Data<std::string>;
 
 TEST(DeductionGuideTest, NonTemplateDeductionGuide)
 {
@@ -75,8 +75,8 @@ struct A {
     T value;
 };
 
-A(int)->A<int>;
-A(const char*)->A<std::string>;
+A(int) -> A<int>;
+A(const char*) -> A<std::string>;
 
 TEST(DeductionGuideTest, DeductionGuideForSimpleAggregate)
 {
@@ -98,7 +98,7 @@ struct B {
 };
 
 template<typename It>
-B(It, It)->B<typename std::iterator_traits<It>::value_type>;
+B(It, It) -> B<typename std::iterator_traits<It>::value_type>;
 
 TEST(DeductionGuideTest, DeductionGuideWithIterator)
 {
