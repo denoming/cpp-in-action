@@ -20,3 +20,4 @@ if(MCPP_ENABLE_PARALLEL)
     find_package(TBB REQUIRED)
 endif()
 
+include(AddBoost)
