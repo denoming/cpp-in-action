@@ -26,6 +26,7 @@ PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/CompareFloatNumbers.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/NewDeleteOperators.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/EnumIterator.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/AnyType.cpp"
 )
 
 target_link_libraries(${TARGET}
