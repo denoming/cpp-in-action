@@ -5,6 +5,7 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
 PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ParallelAlgorithms.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Singleton.cpp"
 )
 
 target_link_libraries(${TARGET}
