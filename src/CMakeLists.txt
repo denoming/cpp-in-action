@@ -1,5 +1,6 @@
 add_subdirectory(common)
 add_subdirectory(general)
+add_subdirectory(idioms)
 if(MCPP_ENABLE_PARALLEL)
     add_subdirectory(parallel)
 endif()
