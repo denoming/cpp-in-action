@@ -1,7 +1,49 @@
 # CMake
-build/
+*build*
 
-# User-specific stuff
+# C++ objects and libs
+*.slo
+*.lo
+*.o
+*.a
+*.la
+*.lai
+*.so
+*.dll
+*.dylib
+
+# Qt-es
+object_script.*.Release
+object_script.*.Debug
+*_plugin_import.cpp
+/.qmake.cache
+/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*.qmlc
+*.jsc
+
+# Qt unit tests
+target_wrapper.*
+
+# QtCreator
+*.autosave
+
+# QtCreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
+# QtCreator CMake
+CMakeLists.txt.user*
+
+# CLion user-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -9,15 +51,15 @@ build/
 .idea/**/shelf
 .idea/**/.gitignore
 .idea/**/codeStyles/
-.idea/**/mcpp.iml
+.idea/**/*.iml
 .idea/**/misc.xml
 .idea/**/modules.xml
 .idea/**/vcs.xml
 
-# Generated files
+# CLion generated files
 .idea/**/contentModel.xml
 
-# Sensitive or high-churn files
+# CLion sensitive or high-churn files
 .idea/**/dataSources/
 .idea/**/dataSources.ids
 .idea/**/dataSources.local.xml
@@ -26,5 +68,5 @@ build/
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# File-based project format
+# CLion file-based project format
 *.iws
