@@ -5,6 +5,14 @@
 using namespace std::string_literals;
 
 /**
+ * Available fold expressions:
+ * ... op pack          => (... (p1 op p2) op p3) ... op pN)
+ * init op ... op pack  => (... (init op p1) op p2) ... op pN)
+ * pack op ...          => (p1 op (p2 op (... (pN-1 op pN) ...)
+ * pack op ... op fini  => (p1 op (p2 op (... (pN op fini) ...)
+ */
+
+/**
  * Sum of all passed arguments (by unary left fold).
  *
  * Expand to: ((arg1 + arg2) + arg3) ...
