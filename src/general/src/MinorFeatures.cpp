@@ -4,9 +4,7 @@
 #include <iostream>
 #include <type_traits>
 
-using ::testing::SizeIs;
-using ::testing::Gt;
-using ::testing::DoubleNear;
+using namespace testing;
 
 TEST(MinorFeaturesTest, RelaxedEnum)
 {

@@ -5,8 +5,7 @@
 #include <iterator>
 #include <random>
 
-using ::testing::IsEmpty;
-using ::testing::ElementsAre;
+using namespace testing;
 
 /* (1) For other cases */
 template<typename T>

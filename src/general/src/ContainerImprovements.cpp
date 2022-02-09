@@ -3,11 +3,7 @@
 
 #include <map>
 
-using ::testing::UnorderedElementsAre;
-using ::testing::Pair;
-using ::testing::Contains;
-using ::testing::Value;
-using ::testing::IsEmpty;
+using namespace testing;
 
 class Node {
 private:

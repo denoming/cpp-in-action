@@ -8,7 +8,7 @@
 #include <string>
 #include <memory_resource>
 
-using ::testing::Lt;
+using namespace testing;
 
 /** Size of memory chunk */
 static const std::size_t BufferSize = 200000;

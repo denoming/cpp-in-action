@@ -4,7 +4,7 @@
 #include <string>
 #include <list>
 
-using ::testing::Gt;
+using namespace testing;
 
 /**
  * Lambda wrapper that provide counting of calls.

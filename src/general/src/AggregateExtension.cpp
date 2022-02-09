@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-using ::testing::IsEmpty;
+using namespace testing;
 
 #include <string>
 

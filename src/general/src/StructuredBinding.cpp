@@ -5,7 +5,7 @@
 #include <map>
 #include <utility>
 
-using ::testing::ElementsAre;
+using namespace testing;
 
 //-------------------------------------------------------------------------------------------------
 
