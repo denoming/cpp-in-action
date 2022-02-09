@@ -1,20 +1,8 @@
-cmake_minimum_required(VERSION 3.8)
-
-#-------------------------------------------------------------------------------
-# Project Declaration
-#-------------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.18)
 
 project(mcpp)
 
-#-------------------------------------------------------------------------------
-# Project Configuration
-#-------------------------------------------------------------------------------
-
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectOptions.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ProjectConfigs.cmake)
-
-#-------------------------------------------------------------------------------
-# Structure Configuration
-#-------------------------------------------------------------------------------
+include(cmake/ProjectOptions.cmake)
+include(cmake/ProjectConfigs.cmake)
 
 add_subdirectory(src)

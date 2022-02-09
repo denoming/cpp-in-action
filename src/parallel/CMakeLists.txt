@@ -4,15 +4,16 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
 PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/ParallelAlgorithms.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Singleton.cpp"
+    src/ParallelAlgorithms.cpp
+    src/Singleton.cpp
 )
 
 target_link_libraries(${TARGET}
 PRIVATE
     ${PROJECT_NAME}::common
-    Threads::Threads
-    TBB::tbb
+    GTest::gtest_main GTest::gmock_main
 )
 
-target_add_tests(TARGET ${TARGET})
+if (NOT CMAKE_CROSSCOMPILING)
+    gtest_discover_tests(${TARGET})
+endif()
