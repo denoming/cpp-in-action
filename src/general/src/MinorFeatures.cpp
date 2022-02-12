@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <iostream>
 #include <type_traits>
 
 using namespace testing;
@@ -41,7 +40,7 @@ TEST(MinorFeaturesTest, HexadecimalFloatingPointLiterals)
 TEST(MinorFeaturesTest, Utf8CharacterLiterals)
 {
     std::u8string s = u8"ᴥ";
-    EXPECT_THAT(s, SizeIs(Gt(1)));
+    EXPECT_GT(s.size(), 1);
 }
 
 //-----------------------------------------------------------------------------
