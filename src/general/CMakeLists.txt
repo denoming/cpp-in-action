@@ -27,6 +27,9 @@ PRIVATE
     src/NewDeleteOperators.cpp
     src/EnumIterator.cpp
     src/AnyType.cpp
+    src/Template.cpp
+    src/TemplateMeta.cpp
+    src/TemplateVariadic.cpp
 )
 
 target_link_libraries(${TARGET}
