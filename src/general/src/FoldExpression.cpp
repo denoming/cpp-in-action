@@ -6,10 +6,12 @@ using namespace std::string_literals;
 
 /**
  * Available fold expressions:
- * ... op pack          => (... (p1 op p2) op p3) ... op pN)
- * init op ... op pack  => (... (init op p1) op p2) ... op pN)
- * pack op ...          => (p1 op (p2 op (... (pN-1 op pN) ...)
- * pack op ... op fini  => (p1 op (p2 op (... (pN op fini) ...)
+ * <ul>
+ *   <li> ( ... op pack )          => ((( pack1 op pack2 ) op pack3 ) ... op packN )
+ *   <li> ( pack op ... )          => ( pack1 op ( ... ( packN-1 op packN )))
+ *   <li> ( init op ... op pack )  => ((( init op pack1 ) op pack2 ) ... op packN )
+ *   <li> ( pack op ... op fini )  => ( pack1 op ( ... ( packN op fini )))
+ *  </ul>
  */
 
 /**
@@ -90,36 +92,87 @@ hashCombine(const Types&... args)
     return seed;
 }
 
-TEST(FoldExpressionTest, Sum)
+struct Node {
+    int value;
+    Node* lh;
+    Node* rh;
+
+    explicit Node(int value)
+        : value{value}
+        , lh{nullptr}
+        , rh{nullptr}
+    {}
+};
+
+template<typename N, typename... Tp>
+Node* traverse(N* node, Tp... paths)
+{
+    return (node ->* ... ->* paths);
+}
+
+template<typename T, typename... Tn>
+constexpr bool isHomogeneous(T t, Tn... tn)
+{
+    return (std::is_same_v<T, Tn> && ...);
+}
+
+TEST(FoldExpression, Sum)
 {
     EXPECT_EQ(sum(1, 2, 3), 6);
 }
 
-TEST(FoldExpressionTest, Sub)
+TEST(FoldExpression, Sub)
 {
     EXPECT_EQ(sub(3, 2, 1), 2);
 }
 
-TEST(FoldExpressionTest, Mul)
+TEST(FoldExpression, Mul)
 {
     EXPECT_EQ(mul(1, 2, 3), 6);
     EXPECT_EQ(mul(), 1); // We can pass an empty parameter pack
 }
 
-TEST(FoldExpressionTest, PrintBySpace)
+TEST(FoldExpression, PrintBySpace)
 {
     printBySpace("Hello", "world", "!");
     EXPECT_TRUE(true);
 }
 
-TEST(FoldExpressionTest, PrintBy)
+TEST(FoldExpression, PrintBy)
 {
     static const char SEP[] = ", ";
     printBy<SEP>("Hello", "world", "!");
     EXPECT_TRUE(true);
 }
 
-TEST(FoldExpressionTest, HashCombine)
+TEST(FoldExpression, HashCombine)
 {
     EXPECT_NE(hashCombine("Hi"s, "World"s, 42), 0);
 }
+
+TEST(FoldExpression, Traverse)
+{
+    auto Node::*pLh = &Node::lh;
+    auto Node::*pRh = &Node::rh;
+
+    auto n1 = new Node{1};
+    auto n2 = new Node{2};
+    auto n3 = new Node{3};
+
+    n1->lh = n2;
+    n2->rh = n3;
+
+    auto r = traverse(n1, pLh, pRh);
+    EXPECT_EQ(r->value, 3);
+
+    delete n3;
+    delete n2;
+    delete n1;
+}
+
+TEST(FoldExpression, isHomogeneous)
+{
+    EXPECT_FALSE(isHomogeneous(5, 5.1, "Hello"));
+    EXPECT_TRUE(isHomogeneous(5, 1));
+}
+
