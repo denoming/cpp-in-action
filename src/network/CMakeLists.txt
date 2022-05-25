@@ -1,0 +1,16 @@
+set(TARGET "${PROJECT_NAME}-network")
+
+add_executable(${TARGET} "")
+
+target_sources(${TARGET}
+    PRIVATE
+        src/Endpoint.cpp
+        src/Socket.cpp
+        src/Resolver.cpp
+)
+
+target_link_libraries(${TARGET}
+    PRIVATE
+        ${PROJECT_NAME}::common
+        GTest::gtest_main GTest::gmock_main
+)
