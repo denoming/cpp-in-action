@@ -2,11 +2,13 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+#include <chrono>
+
 using namespace testing;
 using namespace boost;
 
 using tcp = asio::ip::tcp;
-
 using SocketPtr = std::shared_ptr<tcp::socket>;
 
 class Socket : public Test {
@@ -416,6 +418,48 @@ TEST_F(Socket, AsyncRead)
 
         std::string str{buffer.data(), buffer.data() + ReadBufferSize};
         std::cout << "Read bytes: " << str << std::endl;
+    } catch (const system::system_error& e) {
+        FAIL() << e.what();
+    }
+}
+
+TEST_F(Socket, Cancel)
+{
+    using namespace std::chrono_literals;
+
+    try {
+        tcp::endpoint endpoint(asio::ip::make_address_v4(Localhost), Port);
+        tcp::socket socket(ioc, endpoint.protocol());
+
+        socket.async_connect(endpoint, [](const system::error_code ec) {
+            if (ec) {
+                if (ec == asio::error::operation_aborted) {
+                    std::cout << "Operation was aborted" << std::endl;
+                } else {
+                    FAIL() << ec.message();
+                }
+                return;
+            }
+
+            std::cout << "Connection was established" << std::endl;
+        });
+
+        auto worker = std::jthread(
+            [](asio::io_context& context) {
+                try {
+                    const auto guard = asio::make_work_guard(context);
+                    context.run();
+                } catch (const system::system_error& e) {
+                    FAIL() << e.what();
+                }
+            },
+            std::ref(ioc));
+
+        std::cout << "Attempt to cancel operation" << std::endl;
+        socket.cancel();
+        std::cout << "Operation was cancelled" << std::endl;
+
+        ioc.stop();
     } catch (const system::system_error& e) {
         FAIL() << e.what();
     }
