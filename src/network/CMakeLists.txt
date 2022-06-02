@@ -16,3 +16,4 @@ target_link_libraries(${TARGET}
 )
 
 add_subdirectory(misc/p2p-sync-service)
+add_subdirectory(misc/daytime-async-service)
