@@ -14,3 +14,5 @@ target_link_libraries(${TARGET}
         ${PROJECT_NAME}::common
         GTest::gtest_main GTest::gmock_main
 )
+
+add_subdirectory(misc/p2p-sync-service)
