@@ -3,7 +3,11 @@
 
 #include <boost/asio.hpp>
 #include <boost/program_options.hpp>
+#include <boost/asio/signal_set.hpp>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <iostream>
 
 namespace net = boost::asio;
@@ -22,21 +26,49 @@ print(net::streambuf& buffer)
     }
 }
 
-static void
-executeClient(const std::string& host, const std::string& port)
+std::thread
+spawnWorker(net::io_context& context)
 {
-    net::io_context context;
-    TcpClient client{context};
-    client.connect(host, port);
-    std::cout << client.get() << std::endl;
+    return std::thread{[&context]() {
+        const auto guard = net::make_work_guard(context);
+        context.run();
+    }};
+}
+
+void
+waitForTermination(net::io_context& context)
+{
+    std::mutex closeGuard;
+    std::condition_variable whenClose;
+    bool close{false};
+
+    net::signal_set signal{context, SIGINT, SIGTERM};
+    signal.async_wait([&close, &closeGuard, &whenClose](sys::error_code ec, int) {
+        std::unique_lock lock{closeGuard};
+        close = true;
+        lock.unlock();
+        whenClose.notify_one();
+    });
+
+    std::unique_lock lock{closeGuard};
+    whenClose.wait(lock, [&close]() { return close; });
 }
 
 static void
-executeServer(const std::string& port)
+executeClient(net::io_context& context, const std::string& host, const std::string& port)
 {
-    net::io_context context;
+    TcpClient client{context};
+    client.connect(host, port);
+    std::cout << client.get() << std::endl;
+    context.stop();
+}
+
+static void
+executeServer(net::io_context& context, const std::string& port)
+{
     TcpServer server{context, static_cast<net::ip::port_type>(std::stoi(port))};
-    context.run();
+    waitForTermination(context);
+    context.stop();
 }
 
 int
@@ -65,12 +97,16 @@ main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    net::io_context context;
+    auto thread = spawnWorker(context);
     if (runClient) {
-        executeClient(host, port);
+        executeClient(context, host, port);
     }
     if (runServer) {
-        executeServer(port);
+        executeServer(context, port);
     }
-
+    if (thread.joinable()) {
+        thread.join();
+    }
     return EXIT_SUCCESS;
 }
