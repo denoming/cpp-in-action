@@ -20,3 +20,7 @@ target_link_libraries(${TARGET}
     PUBLIC Threads::Threads
     PRIVATE Boost::headers Boost::program_options
 )
+
+target_compile_definitions(${TARGET}
+    PRIVATE -DBOOST_ASIO_ENABLE_HANDLER_TRACKING
+)

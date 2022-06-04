@@ -1,13 +1,7 @@
 #pragma once
 
+#include "Common.hpp"
 #include "TcpSession.hpp"
-
-#include <boost/asio.hpp>
-
-#include <memory>
-
-namespace net = boost::asio;
-namespace sys = boost::system;
 
 class TcpServer {
 public:

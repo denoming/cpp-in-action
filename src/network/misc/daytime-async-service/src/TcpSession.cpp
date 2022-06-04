@@ -1,10 +1,8 @@
 #include "TcpSession.hpp"
 
-#include <boost/bind/bind.hpp>
+#include <iostream>
 
 #include <ctime>
-
-#include <iostream>
 
 namespace {
 
@@ -45,6 +43,8 @@ TcpSession::process()
 {
     _message.assign(getDayTime());
 
+    HANDLER_LOCATION;
+
     net::async_write(_socket,
                      net::buffer(_message),
                      [self = shared_from_this()](sys::error_code ec, std::size_t bytesWritten) {
@@ -55,6 +55,8 @@ TcpSession::process()
 void
 TcpSession::onWriteDone(sys::error_code ec, std::size_t bytesWritten)
 {
+    HANDLER_LOCATION;
+
     if (ec) {
         std::cerr << "onWriteDone: " << ec.what();
     } else {

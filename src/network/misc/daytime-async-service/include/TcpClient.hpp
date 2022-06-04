@@ -1,9 +1,6 @@
 #pragma once
 
-#include <boost/asio.hpp>
-
-namespace net = boost::asio;
-namespace sys = boost::system;
+#include "Common.hpp"
 
 class TcpClient {
 public:

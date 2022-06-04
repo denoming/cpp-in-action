@@ -1,11 +1,8 @@
 #pragma once
 
-#include <boost/asio.hpp>
+#include "Common.hpp"
 
 #include <memory>
-
-namespace net = boost::asio;
-namespace sys = boost::system;
 
 class TcpSession : public std::enable_shared_from_this<TcpSession> {
 public:
