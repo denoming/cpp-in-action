@@ -1,5 +1,9 @@
 #include "TcpClient.hpp"
 
+#include <boost/asio/use_future.hpp>
+
+#include <iostream>
+
 namespace {
 
 std::string
@@ -26,17 +30,20 @@ TcpClient::connect(std::string_view address, std::string_view port)
     if (endpoints.empty()) {
         throw std::runtime_error{"No address has been resolved"};
     }
-    net::connect(_socket, endpoints);
+
+    auto endpoint = net::async_connect(_socket, endpoints, net::use_future);
+    std::cout << "[TcpClient] connect...";
+    endpoint.wait();
+    std::cout << "done" << std::endl;
 }
 
 std::string
 TcpClient::get()
 {
-    sys::error_code ec;
     net::streambuf buffer;
-    net::read(_socket, buffer, ec);
-    if (ec.failed() && ec != net::error::eof) {
-        throw sys::system_error{ec};
-    }
+    auto length = net::async_read_until(_socket, buffer, '\n', net::use_future);
+    std::cout << "[TcpClient] read...";
+    length.wait();
+    std::cout << length.get() << " bytes" << std::endl;
     return parseResponse(buffer);
 }
