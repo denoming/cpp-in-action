@@ -13,7 +13,7 @@ TEST(Endpoint, Client)
     static const asio::ip::port_type Port{3333};
 
     system::error_code ec;
-    auto ipaddr = asio::ip::address::from_string(RawIpAddress.data(), ec);
+    auto ipaddr = asio::ip::make_address(RawIpAddress.data(), ec);
     ASSERT_FALSE(ec);
 
     asio::ip::tcp::endpoint clientEndpoint{ipaddr, Port};
