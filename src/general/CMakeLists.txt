@@ -30,6 +30,7 @@ PRIVATE
     src/Template.cpp
     src/TemplateMeta.cpp
     src/TemplateVariadic.cpp
+    src/Coroutine.cpp
 )
 
 target_link_libraries(${TARGET}
