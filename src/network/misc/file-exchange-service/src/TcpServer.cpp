@@ -37,13 +37,12 @@ TcpServer::handleSession(TcpServer* /*server*/, tcp::socket&& socket)
     beast::tcp_stream stream{std::move(socket)};
 
     beast::flat_buffer buffer;
-    http::request_parser<http::empty_body> parser;
+    http::request_parser<http::empty_body> reqPar;
     std::cout << "Server: Read initial request\n";
-    http::read_header(stream, buffer, parser);
-    auto req = parser.release();
+    http::read_header(stream, buffer, reqPar);
 
     std::cout << "Server: Check initial request field\n";
-    if (req[http::field::expect] == "100-continue") {
+    if (reqPar.get()[http::field::expect] == "100-continue") {
         http::response<http::empty_body> res{http::status::continue_, kHttpVersion11};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         std::cout << "Server: Write response to initial request\n";
@@ -64,13 +63,13 @@ TcpServer::handleSession(TcpServer* /*server*/, tcp::socket&& socket)
         chunks.append(body.data(), body.size());
         return body.size();
     };
-    parser.on_chunk_header(onHeader);
-    parser.on_chunk_body(onBody);
+    reqPar.on_chunk_header(onHeader);
+    reqPar.on_chunk_body(onBody);
 
     sys::error_code error;
-    while (!parser.is_done()) {
+    while (!reqPar.is_done()) {
         std::cout << "Server: Read chunk\n";
-        http::read(stream.socket(), buffer, parser, error);
+        http::read(stream.socket(), buffer, reqPar, error);
         if (error) {
             if (error == http::error::end_of_chunk) {
                 error = {};

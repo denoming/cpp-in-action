@@ -31,13 +31,14 @@ TcpClient::send(std::string_view host,
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
     req.set(http::field::transfer_encoding, "chunked");
     req.set(http::field::expect, "100-continue");
+    {
+        std::cout << "Client: Write initial request\n";
+        http::request_serializer<http::empty_body, http::fields> reqSer{req};
+        http::write_header(stream, reqSer);
+    }
 
-    std::cout << "Client: Write initial request\n";
-    http::request_serializer<http::empty_body, http::fields> hs{req};
-    http::write_header(stream, hs);
-
-    http::response<http::empty_body> res;
     beast::flat_buffer buffer;
+    http::response<http::empty_body> res;
     std::cout << "Client: Read response to initial request\n";
     http::read(stream, buffer, res);
     if (res.result() != http::status::continue_) {
@@ -46,13 +47,12 @@ TcpClient::send(std::string_view host,
         return;
     }
 
-    const std::size_t kStep = 5;
     std::size_t pos = 0;
     while (pos < message.size()) {
-        net::const_buffer bf = net::buffer(message.substr(pos, kStep));
+        auto chunkBuffer = net::buffer(message.substr(pos, step));
         std::cout << "Client: Write chunk\n";
-        net::write(stream.socket(), http::make_chunk(bf));
-        pos += kStep;
+        net::write(stream.socket(), http::make_chunk(chunkBuffer));
+        pos += step;
     }
     std::cout << "Client: Write chunk last\n";
     net::write(stream.socket(), http::make_chunk_last());
