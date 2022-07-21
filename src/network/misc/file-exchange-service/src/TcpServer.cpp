@@ -86,5 +86,5 @@ TcpServer::handleSession(TcpServer* /*server*/, tcp::socket&& socket)
     std::cout << "> " << chunks << std::endl;
 
     std::cout << "Server: Close\n";
-    stream.socket().shutdown(tcp::socket::shutdown_send);
+    stream.close();
 }

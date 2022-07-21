@@ -59,5 +59,5 @@ TcpClient::send(std::string_view host,
 
     std::cout << "Client: Close\n";
     sys::error_code error;
-    stream.socket().shutdown(tcp::socket::shutdown_both, error);
+    stream.close();
 }
