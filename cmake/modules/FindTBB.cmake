@@ -49,25 +49,47 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 #
-#=============================================================================
-# Copyright 2010-2012 Kitware, Inc.
-# Copyright 2012      Rolf Eike Beer <eike@sf-mail.de>
+# =========================================================================
+# Taken from Copyright.txt in the root of the VTK source tree as per
+# instructions to substitute the full license in place of the summary
+# reference when distributing outside of VTK
+# =========================================================================
 #
-# Distributed under the OSI-approved BSD License (the "License");
-# see accompanying file Copyright.txt for details.
+#  Program:   Visualization Toolkit
+#  Module:    Copyright.txt
 #
-# This software is distributed WITHOUT ANY WARRANTY; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the License for more information.
-#=============================================================================
-# (To distribute this file outside of CMake, substitute the full
-#  License text for the above reference.)
-
-
+# Copyright (c) 1993-2015 Ken Martin, Will Schroeder, Bill Lorensen
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither name of Ken Martin, Will Schroeder, or Bill Lorensen nor the names
+#   of any contributors may be used to endorse or promote products derived
+#   from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# =========================================================================*/
 #=============================================================================
 #  FindTBB helper functions and macros
 #
-
 #====================================================
 # Fix the library path in case it is a linker script
 #====================================================
@@ -76,7 +98,6 @@ function(tbb_extract_real_library library real_library)
     set(${real_library} "${library}" PARENT_SCOPE)
     return()
   endif()
-
   #Read in the first 4 bytes and see if they are the ELF magic number
   set(_elf_magic "7f454c46")
   file(READ ${library} _hex_data OFFSET 0 LIMIT 4 HEX)
@@ -86,12 +107,10 @@ function(tbb_extract_real_library library real_library)
     set(${real_library} "${library}" PARENT_SCOPE)
     return()
   endif()
-
   file(READ ${library} _data OFFSET 0 LIMIT 1024)
   if("${_data}" MATCHES "INPUT \\(([^(]+)\\)")
     #extract out the .so name from REGEX MATCH command
     set(_proper_so_name "${CMAKE_MATCH_1}")
-
     #construct path to the real .so which is presumed to be in the same directory
     #as the input file
     get_filename_component(_so_dir "${library}" DIRECTORY)
@@ -102,7 +121,6 @@ function(tbb_extract_real_library library real_library)
     set(${real_library} "${library}" PARENT_SCOPE)
   endif()
 endfunction()
-
 #===============================================
 # Do the final processing for the package find.
 #===============================================
@@ -116,7 +134,6 @@ macro(findpkg_finish PREFIX TARGET_NAME)
       message(FATAL_ERROR "Required library ${PREFIX} not found.")
     endif ()
   endif ()
-
   if (NOT TARGET "TBB::${TARGET_NAME}")
     if (${PREFIX}_LIBRARY_RELEASE)
       tbb_extract_real_library(${${PREFIX}_LIBRARY_RELEASE} real_release)
@@ -126,28 +143,26 @@ macro(findpkg_finish PREFIX TARGET_NAME)
     endif ()
     add_library(TBB::${TARGET_NAME} UNKNOWN IMPORTED)
     set_target_properties(TBB::${TARGET_NAME} PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${${PREFIX}_INCLUDE_DIR}")
+            INTERFACE_INCLUDE_DIRECTORIES "${${PREFIX}_INCLUDE_DIR}")
     if (${PREFIX}_LIBRARY_DEBUG AND ${PREFIX}_LIBRARY_RELEASE)
       set_target_properties(TBB::${TARGET_NAME} PROPERTIES
-        IMPORTED_LOCATION "${real_release}"
-        IMPORTED_LOCATION_DEBUG "${real_debug}"
-        IMPORTED_LOCATION_RELEASE "${real_release}")
+              IMPORTED_LOCATION "${real_release}"
+              IMPORTED_LOCATION_DEBUG "${real_debug}"
+              IMPORTED_LOCATION_RELEASE "${real_release}")
     elseif (${PREFIX}_LIBRARY_RELEASE)
       set_target_properties(TBB::${TARGET_NAME} PROPERTIES
-        IMPORTED_LOCATION "${real_release}")
+              IMPORTED_LOCATION "${real_release}")
     elseif (${PREFIX}_LIBRARY_DEBUG)
       set_target_properties(TBB::${TARGET_NAME} PROPERTIES
-        IMPORTED_LOCATION "${real_debug}")
+              IMPORTED_LOCATION "${real_debug}")
     endif ()
   endif ()
-
   #mark the following variables as internal variables
   mark_as_advanced(${PREFIX}_INCLUDE_DIR
-                   ${PREFIX}_LIBRARY
-                   ${PREFIX}_LIBRARY_DEBUG
-                   ${PREFIX}_LIBRARY_RELEASE)
+          ${PREFIX}_LIBRARY
+          ${PREFIX}_LIBRARY_DEBUG
+          ${PREFIX}_LIBRARY_RELEASE)
 endmacro()
-
 #===============================================
 # Generate debug names from given release names
 #===============================================
@@ -156,18 +171,16 @@ macro(get_debug_names PREFIX)
     set(${PREFIX}_DEBUG ${${PREFIX}_DEBUG} ${i}d ${i}D ${i}_d ${i}_D ${i}_debug ${i})
   endforeach()
 endmacro()
-
 #===============================================
 # See if we have env vars to help us find tbb
 #===============================================
 macro(getenv_path VAR)
-   set(ENV_${VAR} $ENV{${VAR}})
-   # replace won't work if var is blank
-   if (ENV_${VAR})
-     string( REGEX REPLACE "\\\\" "/" ENV_${VAR} ${ENV_${VAR}} )
-   endif ()
+  set(ENV_${VAR} $ENV{${VAR}})
+  # replace won't work if var is blank
+  if (ENV_${VAR})
+    string( REGEX REPLACE "\\\\" "/" ENV_${VAR} ${ENV_${VAR}} )
+  endif ()
 endmacro()
-
 #===============================================
 # Couple a set of release AND debug libraries
 #===============================================
@@ -180,21 +193,41 @@ macro(make_library_set PREFIX)
     set(${PREFIX} ${${PREFIX}_DEBUG})
   endif ()
 endmacro()
-
-
+#===============================================
+# Ensure that the release & debug libraries found are from the same installation.
+#===============================================
+macro(find_tbb_library_verifying_release_debug_locations PREFIX)
+  find_library(${PREFIX}_RELEASE
+          NAMES ${${PREFIX}_NAMES}
+          HINTS ${TBB_LIB_SEARCH_PATH})
+  if (${PREFIX}_RELEASE)
+    # To avoid finding a mismatched set of release & debug libraries from
+    # different installations if the first found does not have debug libraries
+    # by forcing the search for debug to only occur within the detected release
+    # library directory (if found).  Although this would break detection if the
+    # release & debug libraries were shipped in different directories, this is
+    # not the case in the official TBB releases for any platform.
+    get_filename_component(
+            FOUND_RELEASE_LIB_DIR "${${PREFIX}_RELEASE}" DIRECTORY)
+    find_library(${PREFIX}_DEBUG
+            NAMES ${${PREFIX}_NAMES_DEBUG}
+            HINTS ${FOUND_RELEASE_LIB_DIR}
+            NO_DEFAULT_PATH)
+  else()
+    find_library(${PREFIX}_DEBUG
+            NAMES ${${PREFIX}_NAMES_DEBUG}
+            HINTS ${TBB_LIB_SEARCH_PATH})
+  endif()
+endmacro()
 #=============================================================================
 #  Now to actually find TBB
 #
-
 # Get path, convert backslashes as ${ENV_${var}}
 getenv_path(TBB_ROOT)
-
 # initialize search paths
 set(TBB_PREFIX_PATH ${TBB_ROOT} ${ENV_TBB_ROOT})
 set(TBB_INC_SEARCH_PATH "")
 set(TBB_LIB_SEARCH_PATH "")
-
-
 # If user built from sources
 set(TBB_BUILD_PREFIX $ENV{TBB_BUILD_PREFIX})
 if (TBB_BUILD_PREFIX AND ENV_TBB_ROOT)
@@ -202,14 +235,11 @@ if (TBB_BUILD_PREFIX AND ENV_TBB_ROOT)
   if (NOT ENV_TBB_BUILD_DIR)
     set(ENV_TBB_BUILD_DIR ${ENV_TBB_ROOT}/build)
   endif ()
-
   # include directory under ${ENV_TBB_ROOT}/include
   list(APPEND TBB_LIB_SEARCH_PATH
-    ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_release
-    ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_debug)
+          ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_release
+          ${ENV_TBB_BUILD_DIR}/${TBB_BUILD_PREFIX}_debug)
 endif ()
-
-
 # For Windows, let's assume that the user might be using the precompiled
 # TBB packages from the main website. These use a rather awkward directory
 # structure (at least for automatically finding the right files) depending
@@ -235,7 +265,6 @@ if (WIN32 AND MSVC)
   elseif(MSVC_VERSION GREATER_EQUAL 1900)
     set(COMPILER_PREFIX "vc14")
   endif ()
-
   # for each prefix path, add ia32/64\${COMPILER_PREFIX}\lib to the lib search path
   foreach (dir IN LISTS TBB_PREFIX_PATH)
     if (CMAKE_CL_64)
@@ -249,14 +278,12 @@ if (WIN32 AND MSVC)
     endif ()
   endforeach ()
 endif ()
-
 # For OS X binary distribution, choose libc++ based libraries for Mavericks (10.9)
 # and above and AppleClang
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND
-    NOT CMAKE_SYSTEM_VERSION VERSION_LESS 13.0)
+        NOT CMAKE_SYSTEM_VERSION VERSION_LESS 13.0)
   set (USE_LIBCXX OFF)
   cmake_policy(GET CMP0025 POLICY_VAR)
-
   if (POLICY_VAR STREQUAL "NEW")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
       set (USE_LIBCXX ON)
@@ -266,14 +293,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND
       set (USE_LIBCXX ON)
     endif ()
   endif ()
-
   if (USE_LIBCXX)
     foreach (dir IN LISTS TBB_PREFIX_PATH)
       list (APPEND TBB_LIB_SEARCH_PATH ${dir}/lib/libc++ ${dir}/libc++/lib)
     endforeach ()
   endif ()
 endif ()
-
 # check compiler ABI
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   set(COMPILER_PREFIX)
@@ -299,7 +324,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 else() # Assume compatibility with 4.4 for other compilers
   list(APPEND COMPILER_PREFIX "gcc4.4")
 endif ()
-
 # if platform architecture is explicitly specified
 set(TBB_ARCH_PLATFORM $ENV{TBB_ARCH_PLATFORM})
 if (TBB_ARCH_PLATFORM)
@@ -308,7 +332,6 @@ if (TBB_ARCH_PLATFORM)
     list(APPEND TBB_LIB_SEARCH_PATH ${dir}/lib/${TBB_ARCH_PLATFORM})
   endforeach ()
 endif ()
-
 foreach (dir IN LISTS TBB_PREFIX_PATH)
   foreach (prefix IN LISTS COMPILER_PREFIX)
     if (CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -324,101 +347,75 @@ foreach (dir IN LISTS TBB_PREFIX_PATH)
     endif ()
   endforeach()
 endforeach ()
-
 # add general search paths
 foreach (dir IN LISTS TBB_PREFIX_PATH)
   list(APPEND TBB_LIB_SEARCH_PATH ${dir}/lib ${dir}/Lib ${dir}/lib/tbb
-    ${dir}/Libs)
+          ${dir}/Libs)
   list(APPEND TBB_INC_SEARCH_PATH ${dir}/include ${dir}/Include
-    ${dir}/include/tbb)
+          ${dir}/include/tbb)
 endforeach ()
-
 set(TBB_LIBRARY_NAMES tbb)
 get_debug_names(TBB_LIBRARY_NAMES)
-
-
 find_path(TBB_INCLUDE_DIR
-          NAMES tbb/tbb.h
-          PATHS ${TBB_INC_SEARCH_PATH})
-
-find_library(TBB_LIBRARY_RELEASE
-             NAMES ${TBB_LIBRARY_NAMES}
-             PATHS ${TBB_LIB_SEARCH_PATH})
-find_library(TBB_LIBRARY_DEBUG
-             NAMES ${TBB_LIBRARY_NAMES_DEBUG}
-             PATHS ${TBB_LIB_SEARCH_PATH})
+        NAMES tbb/tbb.h
+        HINTS ${TBB_INC_SEARCH_PATH})
+find_tbb_library_verifying_release_debug_locations(TBB_LIBRARY)
 make_library_set(TBB_LIBRARY)
-
 findpkg_finish(TBB tbb)
-
 #if we haven't found TBB no point on going any further
 if (NOT TBB_FOUND)
   return()
 endif ()
-
 #=============================================================================
 # Look for TBB's malloc package
 set(TBB_MALLOC_LIBRARY_NAMES tbbmalloc)
 get_debug_names(TBB_MALLOC_LIBRARY_NAMES)
-
 find_path(TBB_MALLOC_INCLUDE_DIR
-          NAMES tbb/tbb.h
-          PATHS ${TBB_INC_SEARCH_PATH})
-
-find_library(TBB_MALLOC_LIBRARY_RELEASE
-             NAMES ${TBB_MALLOC_LIBRARY_NAMES}
-             PATHS ${TBB_LIB_SEARCH_PATH})
-find_library(TBB_MALLOC_LIBRARY_DEBUG
-             NAMES ${TBB_MALLOC_LIBRARY_NAMES_DEBUG}
-             PATHS ${TBB_LIB_SEARCH_PATH})
+        NAMES tbb/tbb.h
+        HINTS ${TBB_INC_SEARCH_PATH})
+find_tbb_library_verifying_release_debug_locations(TBB_MALLOC_LIBRARY)
 make_library_set(TBB_MALLOC_LIBRARY)
-
 findpkg_finish(TBB_MALLOC tbbmalloc)
-
 #=============================================================================
 # Look for TBB's malloc proxy package
 set(TBB_MALLOC_PROXY_LIBRARY_NAMES tbbmalloc_proxy)
 get_debug_names(TBB_MALLOC_PROXY_LIBRARY_NAMES)
-
 find_path(TBB_MALLOC_PROXY_INCLUDE_DIR
-          NAMES tbb/tbbmalloc_proxy.h
-          PATHS ${TBB_INC_SEARCH_PATH})
-
-find_library(TBB_MALLOC_PROXY_LIBRARY_RELEASE
-             NAMES ${TBB_MALLOC_PROXY_LIBRARY_NAMES}
-             PATHS ${TBB_LIB_SEARCH_PATH})
-find_library(TBB_MALLOC_PROXY_LIBRARY_DEBUG
-             NAMES ${TBB_MALLOC_PROXY_LIBRARY_NAMES_DEBUG}
-             PATHS ${TBB_LIB_SEARCH_PATH})
+        NAMES tbb/tbbmalloc_proxy.h
+        HINTS ${TBB_INC_SEARCH_PATH})
+find_tbb_library_verifying_release_debug_locations(TBB_MALLOC_PROXY_LIBRARY)
 make_library_set(TBB_MALLOC_PROXY_LIBRARY)
-
 findpkg_finish(TBB_MALLOC_PROXY tbbmalloc_proxy)
-
-
 #=============================================================================
 #parse all the version numbers from tbb
 if(NOT TBB_VERSION)
-
- #only read the start of the file
- file(STRINGS
-      "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h"
-      TBB_VERSION_CONTENTS
-      REGEX "VERSION")
-
+  set(TBB_VERSION_FILE_PRIOR_TO_TBB_2021_1
+          "${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h")
+  set(TBB_VERSION_FILE_AFTER_TBB_2021_1
+          "${TBB_INCLUDE_DIR}/oneapi/tbb/version.h")
+  if (EXISTS "${TBB_VERSION_FILE_PRIOR_TO_TBB_2021_1}")
+    set(TBB_VERSION_FILE "${TBB_VERSION_FILE_PRIOR_TO_TBB_2021_1}")
+  elseif (EXISTS "${TBB_VERSION_FILE_AFTER_TBB_2021_1}")
+    set(TBB_VERSION_FILE "${TBB_VERSION_FILE_AFTER_TBB_2021_1}")
+  else()
+    message(FATAL_ERROR "Found TBB installation: ${TBB_INCLUDE_DIR} "
+            "missing version header.")
+  endif()
+  #only read the start of the file
+  file(STRINGS
+          "${TBB_VERSION_FILE}"
+          TBB_VERSION_CONTENTS
+          REGEX "VERSION")
   string(REGEX REPLACE
-    ".*#define TBB_VERSION_MAJOR ([0-9]+).*" "\\1"
-    TBB_VERSION_MAJOR "${TBB_VERSION_CONTENTS}")
-
+          ".*#define TBB_VERSION_MAJOR ([0-9]+).*" "\\1"
+          TBB_VERSION_MAJOR "${TBB_VERSION_CONTENTS}")
   string(REGEX REPLACE
-    ".*#define TBB_VERSION_MINOR ([0-9]+).*" "\\1"
-    TBB_VERSION_MINOR "${TBB_VERSION_CONTENTS}")
-
+          ".*#define TBB_VERSION_MINOR ([0-9]+).*" "\\1"
+          TBB_VERSION_MINOR "${TBB_VERSION_CONTENTS}")
   string(REGEX REPLACE
-        ".*#define TBB_INTERFACE_VERSION ([0-9]+).*" "\\1"
-        TBB_INTERFACE_VERSION "${TBB_VERSION_CONTENTS}")
-
+          ".*#define TBB_INTERFACE_VERSION ([0-9]+).*" "\\1"
+          TBB_INTERFACE_VERSION "${TBB_VERSION_CONTENTS}")
   string(REGEX REPLACE
-        ".*#define TBB_COMPATIBLE_INTERFACE_VERSION ([0-9]+).*" "\\1"
-        TBB_COMPATIBLE_INTERFACE_VERSION "${TBB_VERSION_CONTENTS}")
-
+          ".*#define TBB_COMPATIBLE_INTERFACE_VERSION ([0-9]+).*" "\\1"
+          TBB_COMPATIBLE_INTERFACE_VERSION "${TBB_VERSION_CONTENTS}")
 endif()
