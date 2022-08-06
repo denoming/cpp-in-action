@@ -18,3 +18,6 @@ target_link_libraries(${TARGET}
 add_subdirectory(misc/p2p-sync-service)
 add_subdirectory(misc/daytime-async-service)
 add_subdirectory(misc/file-exchange-service)
+add_subdirectory(misc/tcp-async-service)
+add_subdirectory(misc/tcp-sync-service)
+add_subdirectory(misc/udp-sync-service)
