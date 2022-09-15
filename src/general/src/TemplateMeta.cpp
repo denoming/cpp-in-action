@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
-#include <memory>
 #include <string>
 #include <iostream>
 #include <type_traits>
@@ -9,10 +9,59 @@ using namespace testing;
 
 //--------------------------------------------------------------------------------------------------
 
+template<unsigned p, unsigned g>
+struct DoIsPrime {
+    static constexpr bool value = (p % g != 0) && DoIsPrime<p, g - 1>::value;
+};
+
+template<unsigned p>
+struct DoIsPrime<p, 2> {
+    static constexpr bool value = (p % 2 != 0);
+};
+
+/* Prior to C++11 way to do compile time computation */
+template<unsigned p>
+struct IsPrime {
+    static constexpr bool value = DoIsPrime<p, p / 2>::value;
+};
+
+template<>
+struct IsPrime<0> {
+    static constexpr bool value = false;
+};
+template<>
+struct IsPrime<1> {
+    static constexpr bool value = false;
+};
+template<>
+struct IsPrime<2> {
+    static constexpr bool value = true;
+};
+template<>
+struct IsPrime<3> {
+    static constexpr bool value = true;
+};
+
+// or
+
+/* C++14 and above way to do compile time computation */
+constexpr bool
+isPrime(unsigned p)
+{
+    for (unsigned d = 2; d <= p / 2; ++d) {
+        if (p % d == 0) {
+            return false;
+        }
+    }
+    return (p > 1);
+}
+
+//--------------------------------------------------------------------------------------------------
+
 class Person {
 public:
     template<typename T>
-    using EnableIfString = std::enable_if_t<std::is_convertible_v<T, std::string>>;
+    using EnableIfString = std::enable_if_t<std::is_constructible_v<std::string, T>>;
 
     // Generic ctor for passed initial name
     template<typename S, typename = EnableIfString<S>>
@@ -101,7 +150,8 @@ public:
         std::cout << "Copy constructor" << std::endl;
     }
 
-    SomeType& operator=(const SomeType&)
+    SomeType&
+    operator=(const SomeType&)
     {
         std::cout << "Copy operator" << std::endl;
         return *this;
@@ -112,7 +162,8 @@ public:
         std::cout << "Move constructor" << std::endl;
     }
 
-    SomeType& operator=(SomeType&&) noexcept
+    SomeType&
+    operator=(SomeType&&) noexcept
     {
         std::cout << "Move operator" << std::endl;
         return *this;
@@ -120,19 +171,22 @@ public:
 };
 
 template<typename T>
-auto get(T in)
+auto
+get(T in)
 {
     return in;
 }
 
 template<typename T>
-void set(T in)
+void
+set(T in)
 {
     // some work //
 }
 
 template<typename T>
-void perfectForward(T value)
+void
+perfectForward(T value)
 {
     auto&& temp = get(std::move(value));
     // do some work with temp //
@@ -145,6 +199,35 @@ template<typename T>
 union DataChunks {
     T data;
     std::uint8_t chunks[sizeof(T)];
+};
+
+//--------------------------------------------------------------------------------------------------
+
+template<int S, bool = isPrime(S)>
+struct Helper {
+    static void
+    f1()
+    {
+        /* Some helper function for default case */
+    }
+};
+
+template<int S>
+struct Helper<S, true> {
+    static void
+    f1()
+    {
+        /* Specific helper function for case when S is prime */
+    }
+};
+
+template<int S>
+struct Helper<S, false> {
+    static void
+    f1()
+    {
+        /* Specific helper function for case when S is not prime */
+    }
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -191,4 +274,19 @@ TEST(TemplateMeta, Union)
     d.data = 258;
     EXPECT_EQ(d.chunks[0], 2);
     EXPECT_EQ(d.chunks[1], 1);
+}
+
+TEST(TemplateMeta, CompileComuting)
+{
+    static_assert(IsPrime<7>::value);
+    static_assert(IsPrime<3>::value);
+
+    static_assert(!IsPrime<8>::value);
+    static_assert(!IsPrime<4>::value);
+
+    static_assert(isPrime(7));
+    static_assert(isPrime(3));
+
+    static_assert(!isPrime(8));
+    static_assert(!isPrime(4));
 }
