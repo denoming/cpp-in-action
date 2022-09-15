@@ -2,9 +2,11 @@
 #include <gmock/gmock.h>
 
 #include <vector>
+#include <array>
 #include <deque>
 #include <string>
 #include <numeric>
+#include <type_traits>
 
 #include <iostream>
 #include <iomanip>
@@ -16,17 +18,36 @@ template<typename T = long double>
 constexpr T Pi = T{3.1415926535897932385};
 
 // Example of variable template for data member
-//  Using: isSigned<char> instead of std::numeric_limits<char>::is_signed
+// Using: isSigned<char> instead of std::numeric_limits<char>::is_signed
 template<typename T>
 constexpr bool isSigned = std::numeric_limits<T>::is_signed;
 
+// Simple max function implementation with auto (best solution)
+// Simple max function implementation with auto (best solution)
 template<typename T1, typename T2>
 auto
-max(T1 a, T2 b)
+max1(T1 a, T2 b)
 {
     return b < a ? a : b;
 }
 
+// Simple max function implementation with common return type deducing
+template<typename T1, typename T2>
+std::common_type_t<T1, T2>
+max2(T1 a, T2 b)
+{
+    return b < a ? a : b;
+}
+
+// Simple max function implementation with explicit template parameter for return type
+template<typename T1, typename T2, typename R = std::common_type_t<T1, T2>>
+R
+max3(T1 a, T2 b)
+{
+    return b < a ? a : b;
+}
+
+// Simple example with default values for template parameter
 template<auto V, typename T = decltype(V)>
 T
 add(T input)
@@ -123,7 +144,7 @@ operator<<(std::ostream& os, const Stack<U>& stack)
     return os;
 }
 
-/* Class template specification for T* */
+/* Class template specialization for T* */
 template<typename T, template<typename E> typename C>
 class Stack<T*, C> {
 public:
@@ -173,7 +194,7 @@ private:
     C<T*> _elements;
 };
 
-/* Class template specification for std::string */
+/* Class template specialization for std::string */
 template<>
 class Stack<std::string, std::deque> {
 public:
@@ -235,6 +256,64 @@ private:
     std::deque<std::string> _elements;
 };
 
+/* Class template with non-type template parameter */
+template<typename T, auto MaxSize>
+class FixedStack {
+public:
+    using size_type = decltype(MaxSize);
+
+    FixedStack()
+        : _index{0}
+    {
+    }
+
+    void
+    push(const T& e)
+    {
+        assert(_index < MaxSize);
+        _elements[_index] = e;
+        _index++;
+    }
+
+    void
+    push(T&& e)
+    {
+        assert(_index < MaxSize);
+        _elements[_index] = std::move(e);
+        _index++;
+    }
+
+    void
+    pop()
+    {
+        assert(_index >= 0);
+        _index--;
+    }
+
+    [[nodiscard]] const T&
+    top() const
+    {
+        assert(_index > 0);
+        return _elements[_index - 1];
+    }
+
+    [[nodiscard]] bool
+    empty() const
+    {
+        return (_index == 0);
+    }
+
+    [[nodiscard]] std::size_t
+    size() const
+    {
+        return _index;
+    }
+
+private:
+    std::size_t _index;
+    std::array<T, MaxSize> _elements;
+};
+
 template<typename T>
 struct ValueWithComment {
     T value;
@@ -249,9 +328,10 @@ struct ValueWithComment {
     }
 };
 
-/* Deduction guides */
+/* Deduction guides for Stack class template */
 template<template<typename E> class C = std::deque>
 Stack(const char*) -> Stack<std::string, C>;
+/* Deduction guides for ValueWithComment class template */
 ValueWithComment(const char*, const char*) -> ValueWithComment<std::string>;
 
 class BoolString {
@@ -341,9 +421,19 @@ private:
 
 TEST(Template, Function)
 {
-    EXPECT_THAT(::max(4, 5), Eq(5));
-    EXPECT_THAT(::max(4, 7.0), DoubleEq(7.0));
-    EXPECT_THAT(::max(7.0, 4), DoubleEq(7.0));
+    bool b1 = std::is_same_v<decltype(::max1(7.0, 4)), decltype(::max1(4, 7.0))>;
+    EXPECT_TRUE(b1);
+    bool b2 = std::is_same_v<decltype(::max2(7.0, 4)), decltype(::max2(4, 7.0))>;
+    EXPECT_TRUE(b2);
+    bool b3 = std::is_same_v<decltype(::max3(7.0, 4)), decltype(::max3(4, 7.0))>;
+    EXPECT_TRUE(b3);
+
+    EXPECT_THAT(::max1(4, 7.0), DoubleEq(7.0));
+    EXPECT_THAT(::max1(7.0, 4), DoubleEq(7.0));
+    EXPECT_THAT(::max2(4, 7.0), DoubleEq(7.0));
+    EXPECT_THAT(::max2(7.0, 4), DoubleEq(7.0));
+    EXPECT_THAT(::max3(4, 7.0), DoubleEq(7.0));
+    EXPECT_THAT(::max3(7.0, 4), DoubleEq(7.0));
 }
 
 TEST(Template, Class)
@@ -377,6 +467,18 @@ TEST(Template, Class)
     stack3.push(v2.get());
     stack3.push(v3.get());
     std::cout << stack3;
+}
+
+TEST(Template, ClassWithNonTypeParameter)
+{
+    using IntFixedStack = FixedStack<int, 3>;
+
+    IntFixedStack stack;
+    stack.push(10);
+    stack.push(20);
+    stack.push(30);
+
+    EXPECT_EQ(stack.size(), 3);
 }
 
 TEST(Template, DeductionGuide)
