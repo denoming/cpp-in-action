@@ -23,5 +23,4 @@ target_link_libraries(${TARGET}
 target_compile_definitions(${TARGET}
     PRIVATE -DBOOST_ASIO_ENABLE_HANDLER_TRACKING
             -DBOOST_ASIO_ENABLE_BUFFER_DEBUGGING
-            -DBOOST_BEAST_USE_STD_STRING_VIEW
 )
