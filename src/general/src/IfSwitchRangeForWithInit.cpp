@@ -4,8 +4,9 @@
 #include <string>
 #include <map>
 #include <filesystem>
+#include <vector>
 
-TEST(IfAndSwitchWithInitTest, InsertWithCheck)
+TEST(IfSwitchRangeForWithInit, InsertWithCheck)
 {
     std::map<std::string, unsigned> coll;
     coll.insert({"New", 42});
@@ -17,7 +18,7 @@ TEST(IfAndSwitchWithInitTest, InsertWithCheck)
     FAIL() << "Not expected";
 }
 
-TEST(IfAndSwitchWithInitTest, Switch)
+TEST(IfSwitchRangeForWithInit, Switch)
 {
     namespace fs = std::filesystem;
     switch (fs::path p{"/tmp"}; status(p).type()) {
@@ -30,4 +31,13 @@ TEST(IfAndSwitchWithInitTest, Switch)
     default:
         FAIL() << "Not expected";
     }
+}
+
+TEST(IfSwitchRangeForWithInit, RangeFor)
+{
+    int32_t sum{0};
+    for (auto numbers = std::vector{1, 5, 7}; auto number : numbers) {
+        sum += number;
+    }
+    EXPECT_EQ(sum, 13);
 }

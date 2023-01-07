@@ -38,7 +38,7 @@ TEST(ExtendedUsingDeclarationTest, VariadicUsingDeclarations)
     EXPECT_TRUE(true);
 }
 
-//-----------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
 template<typename T>
 class Base {
@@ -68,4 +68,30 @@ TEST(ExtendedUsingDeclarationTest, VariadicUsingForInheritingConstructors)
     MultiType m3 = true;
 
     EXPECT_TRUE(true);
+}
+
+//--------------------------------------------------------------------------------------------------
+
+enum class Color { red, green, blue };
+
+std::string_view
+toString(Color color)
+{
+    using enum Color;
+    switch (color) {
+    case red:
+        return "red";
+    case green:
+        return "green";
+    case blue:
+        return "blue";
+    default:
+        return "unknown";
+    }
+}
+
+TEST(ExtendedUsingDeclarationTest, UsingEnum)
+{
+    using enum Color;
+    std::cout << "toString(green): " << toString(green) << std::endl;
 }

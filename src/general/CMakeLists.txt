@@ -11,7 +11,7 @@ PRIVATE
     src/ExtendedUsingDeclaration.cpp
     src/FileSystem.cpp
     src/FoldExpression.cpp
-    src/IfAndSwitchWithInit.cpp
+        src/IfSwitchRangeForWithInit.cpp
     src/LambdaExtension.cpp
     src/MinorFeatures.cpp
     src/Optional.cpp
