@@ -32,6 +32,7 @@ PRIVATE
     src/TemplateVariadic.cpp
     src/Coroutine.cpp
     src/ThreeWayComparison.cpp
+    src/Attributes.cpp
 )
 
 target_link_libraries(${TARGET}
