@@ -8,7 +8,7 @@ target_sources(${TARGET}
     PRIVATE
         src/TcpClient.cpp
         src/TcpServer.cpp
-        src/main.cpp
+        src/Service.cpp
 )
 
 target_include_directories(${TARGET}

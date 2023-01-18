@@ -1,4 +1,4 @@
-set(TARGET "network-sync-udp-comm")
+set(TARGET "udp-sync-service")
 
 find_package(Threads REQUIRED)
 
@@ -6,8 +6,7 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
-        src/UdpSyncClient.cpp
-        src/main.cpp
+        src/Service.cpp
 )
 
 target_include_directories(${TARGET}
@@ -17,4 +16,9 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
     PUBLIC Threads::Threads
     PRIVATE Boost::headers
+)
+
+target_compile_definitions(${TARGET}
+    PRIVATE -DBOOST_ASIO_ENABLE_HANDLER_TRACKING
+            -DBOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 )

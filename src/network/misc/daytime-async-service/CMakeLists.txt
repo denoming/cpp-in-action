@@ -9,7 +9,7 @@ target_sources(${TARGET}
         src/TcpServer.cpp
         src/TcpSession.cpp
         src/TcpClient.cpp
-        src/main.cpp
+        src/Service.cpp
 )
 
 target_include_directories(${TARGET}

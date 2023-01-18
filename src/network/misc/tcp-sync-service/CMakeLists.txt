@@ -10,7 +10,7 @@ target_sources(${TARGET}
         src/TcpSyncAcceptor.cpp
         src/TcpSyncService.cpp
         src/TcpSyncServer.cpp
-        src/main.cpp
+        src/Service.cpp
 )
 
 target_include_directories(${TARGET}

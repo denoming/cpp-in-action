@@ -10,7 +10,7 @@ target_sources(${TARGET}
         src/TcpAsyncClient.cpp
         src/TcpAsyncServer.cpp
         src/TcpAsyncService.cpp
-        src/main.cpp
+        src/Service.cpp
 )
 
 target_include_directories(${TARGET}
