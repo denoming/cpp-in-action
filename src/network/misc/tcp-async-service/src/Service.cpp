@@ -58,7 +58,6 @@ executeServer()
             std::cerr << "executeServer: " << ec.what() << std::endl;
         }
 
-        std::cout << "signals.async_wait" << std::endl;
         std::unique_lock lock{exitMutex};
         exit = true;
         lock.unlock();
