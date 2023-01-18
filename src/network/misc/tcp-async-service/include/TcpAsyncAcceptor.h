@@ -19,7 +19,7 @@ public:
 
 private:
     void
-    waitConnection();
+    waitForConnection();
 
     void
     onAcceptDone(sys::error_code ec, std::shared_ptr<net::ip::tcp::socket> socket);
@@ -28,4 +28,5 @@ private:
     std::atomic<bool> _stop;
     net::io_context& _context;
     net::ip::tcp::acceptor _acceptor;
+    net::ip::tcp::endpoint _endpoint;
 };
