@@ -11,7 +11,7 @@ PRIVATE
     src/ExtendedUsingDeclaration.cpp
     src/FileSystem.cpp
     src/FoldExpression.cpp
-        src/IfSwitchRangeForWithInit.cpp
+    src/IfSwitchRangeForWithInit.cpp
     src/LambdaExtension.cpp
     src/MinorFeatures.cpp
     src/Optional.cpp
@@ -33,6 +33,7 @@ PRIVATE
     src/Coroutine.cpp
     src/ThreeWayComparison.cpp
     src/Attributes.cpp
+    src/Concepts.cpp
 )
 
 target_link_libraries(${TARGET}
