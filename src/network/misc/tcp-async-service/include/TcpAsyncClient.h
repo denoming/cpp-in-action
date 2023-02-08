@@ -20,7 +20,8 @@ public:
     explicit TcpAsyncClient(std::size_t numberOfThread = std::thread::hardware_concurrency());
 
     [[maybe_unused]] RequestId
-    communicate(std::string_view address,
+    communicate(std::string messasge,
+                std::string_view address,
                 net::ip::port_type port,
                 RequestCallback callback);
 

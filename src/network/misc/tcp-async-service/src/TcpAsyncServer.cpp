@@ -1,7 +1,5 @@
 #include "TcpAsyncServer.h"
 
-#include <iostream>
-
 namespace {
 
 std::thread
@@ -26,15 +24,16 @@ TcpAsyncServer::~TcpAsyncServer()
 }
 
 void
-TcpAsyncServer::start(net::ip::port_type port, std::size_t numberOfThread)
+TcpAsyncServer::start(net::ip::port_type port, std::size_t threadsNum)
 {
     _acceptor = std::make_unique<TcpAsyncAcceptor>(_context, port);
-    _acceptor->start();
 
-    assert(numberOfThread > 0);
-    while (numberOfThread--) {
+    assert(threadsNum > 0);
+    while (threadsNum--) {
         _threads.push_back(spawnContextThread(_context));
     }
+
+    _acceptor->start();
 }
 
 void

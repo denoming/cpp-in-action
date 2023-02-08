@@ -22,13 +22,16 @@ TcpAsyncClient::TcpAsyncClient(std::size_t numberOfThread)
 }
 
 TcpAsyncClient::RequestId
-TcpAsyncClient::communicate(std::string_view address,
+TcpAsyncClient::communicate(std::string message,
+                            std::string_view address,
                             net::ip::port_type port,
                             RequestCallback callback)
 {
-    std::string request{"Ping\n"};
+    /* Add terminal message symbol */
+    message.push_back('\n');
+
     auto session = std::make_shared<Session>(
-        0, std::move(request), address, port, std::move(callback), _context);
+        0, std::move(message), address, port, std::move(callback), _context);
 
     const auto id{getRequestId()};
     std::unique_lock lock{_sessionsGuard};

@@ -16,14 +16,15 @@ namespace po = boost::program_options;
 using namespace std::chrono_literals;
 
 static void
-executeClient()
+executeClient(std::string message)
 {
     bool exit{false};
     std::mutex exitMutex;
     std::condition_variable whenExit;
 
     TcpAsyncClient client;
-    client.communicate("127.0.0.1",
+    client.communicate(std::move(message),
+                       "127.0.0.1",
                        3333,
                        [&](const auto requestId, std::string response, const sys::error_code ec) {
                            if (ec) {
@@ -76,6 +77,7 @@ executeServer()
 int
 main(int argc, char* argv[])
 {
+    std::string message;
     bool runClient{false};
     bool runServer{false};
 
@@ -85,6 +87,7 @@ main(int argc, char* argv[])
         ("help", "produce help message")
         ("client,c", po::bool_switch(&runClient), "Run client")
         ("server,s", po::bool_switch(&runServer), "Run server")
+        ("message,m", po::value<std::string>(&message)->default_value("Ping"), "Message to send")
         ;
     // clang-format on
 
@@ -97,7 +100,7 @@ main(int argc, char* argv[])
     }
 
     if (runClient) {
-        executeClient();
+        executeClient(std::move(message));
     }
     if (runServer) {
         executeServer();

@@ -17,20 +17,13 @@ TcpAsyncAcceptor::start()
 {
     _stop = false;
 
-    sys::error_code ec;
-    _acceptor.open(_endpoint.protocol(), ec);
-    if (ec) {
-        std::cerr << "start(open): " << ec.what() << std::endl;
-    }
-
-    _acceptor.bind(_endpoint, ec);
-    if (ec) {
-        std::cerr << "start(bind): " << ec.what() << std::endl;
-    }
-
-    _acceptor.listen(net::socket_base::max_connections, ec);
-    if (ec) {
-        std::cerr << "start(listen): " << ec.what() << std::endl;
+    try {
+        _acceptor.open(_endpoint.protocol());
+        _acceptor.set_option(net::ip::tcp::acceptor::reuse_address{true});
+        _acceptor.bind(_endpoint);
+        _acceptor.listen();
+    } catch (const sys::system_error& e) {
+        std::cerr << "start: " << e.what() << std::endl;
     }
 
     waitForConnection();
@@ -42,34 +35,32 @@ TcpAsyncAcceptor::stop()
     _stop = true;
 
     sys::error_code ec;
-    _acceptor.cancel(ec);
-    if (ec) {
+    if (_acceptor.cancel(ec); ec) {
         std::cerr << "stop(cancel): " << ec.what() << std::endl;
     }
-
-    _acceptor.close(ec);
-    if (ec) {
-        std::cerr << "close(close): " << ec.what() << std::endl;
+    if (_acceptor.close(ec); ec) {
+        std::cerr << "stop(close): " << ec.what() << std::endl;
     }
 }
 
 void
 TcpAsyncAcceptor::waitForConnection()
 {
-    /* Create connection socket and initialize async accept procedure */
-    auto socket = std::make_shared<net::ip::tcp::socket>(_context);
-    _acceptor.async_accept(*socket,
-                           [this, socket](sys::error_code ec) { onAcceptDone(ec, socket); });
+    /* Create socket fo new connection */
+    _socket.emplace(_context);
+
+    /* Accept incoming connection asynchronously */
+    _acceptor.async_accept(*_socket, std::bind_front(&TcpAsyncAcceptor::onAcceptDone, this));
 }
 
 void
-TcpAsyncAcceptor::onAcceptDone(sys::error_code ec, std::shared_ptr<net::ip::tcp::socket> socket)
+TcpAsyncAcceptor::onAcceptDone(const sys::error_code& ec)
 {
     if (ec) {
         std::cerr << "onAcceptDone: " << ec.what() << std::endl;
     } else {
         /* Handle current connection */
-        (new TcpAsyncService(std::move(socket)))->handle();
+        std::make_shared<TcpAsyncService>(std::move(*_socket))->handle();
     }
 
     if (_stop) {

@@ -5,30 +5,23 @@
 namespace net = boost::asio;
 namespace sys = boost::system;
 
-#include <atomic>
 #include <memory>
 
-class TcpAsyncService {
+class TcpAsyncService : public std::enable_shared_from_this<TcpAsyncService> {
 public:
-    explicit TcpAsyncService(std::shared_ptr<net::ip::tcp::socket> socket);
+    explicit TcpAsyncService(net::ip::tcp::socket&& socket);
 
     void
     handle();
 
 private:
     void
-    onReadDone(sys::error_code ec, std::size_t bytesRead);
+    onReadDone(const sys::error_code& ec, std::size_t bytesRead);
 
     void
-    onWriteDone(sys::error_code ec, std::size_t bytesWritten);
-
-    void
-    onFinish();
-
-    std::string
-    process();
+    onWriteDone(const sys::error_code& ec, std::size_t bytesWritten);
 
 private:
-    std::shared_ptr<net::ip::tcp::socket> _socket;
+    net::ip::tcp::socket _socket;
     net::streambuf _buffer;
 };

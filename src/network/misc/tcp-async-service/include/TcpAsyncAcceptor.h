@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 
 #include <atomic>
+#include <optional>
 
 namespace net = boost::asio;
 namespace sys = boost::system;
@@ -22,11 +23,12 @@ private:
     waitForConnection();
 
     void
-    onAcceptDone(sys::error_code ec, std::shared_ptr<net::ip::tcp::socket> socket);
+    onAcceptDone(const sys::error_code& ec);
 
 private:
     std::atomic<bool> _stop;
     net::io_context& _context;
     net::ip::tcp::acceptor _acceptor;
     net::ip::tcp::endpoint _endpoint;
+    std::optional<net::ip::tcp::socket> _socket;
 };

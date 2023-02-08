@@ -19,7 +19,7 @@ public:
 
     void
     start(net::ip::port_type port,
-          std::size_t numberOfThread = std::thread::hardware_concurrency());
+          std::size_t threadsNum = std::thread::hardware_concurrency());
 
     void
     stop();
