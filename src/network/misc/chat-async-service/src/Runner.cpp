@@ -1,5 +1,7 @@
 #include "Runner.hpp"
 
+#include <cstdio>
+
 void
 Runner::run(std::size_t threadsNum)
 {
@@ -23,7 +25,8 @@ void
 Runner::spawnThreads(std::size_t threadsNum)
 {
     assert(threadsNum >= 2);
-    for (std::size_t n{0}; n < threadsNum; ++n) {
+    for (std::size_t n{1}; n <= threadsNum; ++n) {
+        std::printf("Spawn <%zu> thread\n", n);
         _threads.emplace_back([this]() { _context.run(); });
     }
 }
