@@ -9,6 +9,7 @@ target_sources(${TARGET}
         src/Service.cpp
         src/ChatServer.cpp
         src/ChatSession.cpp
+        src/Runner.cpp
 )
 
 target_include_directories(${TARGET}

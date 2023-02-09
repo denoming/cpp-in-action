@@ -1,13 +1,14 @@
-#include "Common.hpp"
 
+#include "Common.hpp"
 #include "ChatServer.hpp"
+#include "Runner.hpp"
 
 int
 main()
 {
-    asio::io_context context;
-    ChatServer server{context, 8080};
+    Runner runner;
+    ChatServer server{runner.context(), 8080};
     server.listen();
-    context.run();
+    runner.run(4);
     return EXIT_SUCCESS;
 }
