@@ -8,6 +8,7 @@ target_sources(${TARGET}
         src/Socket.cpp
         src/Resolver.cpp
         src/ThreadPool.cpp
+        src/Context.cpp
 )
 
 target_link_libraries(${TARGET}
