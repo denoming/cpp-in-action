@@ -33,15 +33,13 @@ ChatServer::doListen()
 void
 ChatServer::doAccept()
 {
-    _socket.emplace(_context);
-
-    _acceptor.async_accept(*_socket, [this](sys::error_code errorCode) {
+    _acceptor.async_accept(_context, [this](sys::error_code errorCode, tcp::socket socket) {
         if (errorCode) {
             std::cerr << "doAccept: " << errorCode.message() << std::endl;
             return;
         }
 
-        auto client = std::make_shared<ChatSession>(std::move(*_socket));
+        auto client = std::make_shared<ChatSession>(_context, std::move(socket));
         client->post("Welcome to chat\n\r");
         post("We have a newcomer\n\r");
 

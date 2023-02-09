@@ -28,7 +28,5 @@ private:
     asio::io_context& _context;
     tcp::endpoint _endpoint;
     tcp::acceptor _acceptor;
-
-    std::optional<tcp::socket> _socket;
     std::unordered_set<ChatSession::Ptr> _clients;
 };

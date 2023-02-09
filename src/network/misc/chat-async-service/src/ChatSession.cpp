@@ -3,8 +3,10 @@
 #include <sstream>
 #include <iostream>
 
-ChatSession::ChatSession(tcp::socket&& socket)
+ChatSession::ChatSession(asio::io_context& context, tcp::socket&& socket)
     : _socket{std::move(socket)}
+    , _strandR{context}
+    , _strandW{context}
 {
 }
 
@@ -30,7 +32,10 @@ void
 ChatSession::read()
 {
     asio::async_read_until(
-        _socket, _buffer, "\n", std::bind_front(&ChatSession::onRead, shared_from_this()));
+        _socket,
+        _buffer,
+        "\n",
+        asio::bind_executor(_strandR, std::bind_front(&ChatSession::onRead, shared_from_this())));
 }
 
 void
@@ -52,9 +57,10 @@ ChatSession::onRead(sys::error_code errorCode, std::size_t bytes)
 void
 ChatSession::write()
 {
-    asio::async_write(_socket,
-                      asio::buffer(_outgoing.front()),
-                      std::bind_front(&ChatSession::onWrite, shared_from_this()));
+    asio::async_write(
+        _socket,
+        asio::buffer(_outgoing.front()),
+        asio::bind_executor(_strandW, std::bind_front(&ChatSession::onWrite, shared_from_this())));
 }
 
 void

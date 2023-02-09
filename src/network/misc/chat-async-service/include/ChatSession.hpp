@@ -10,7 +10,7 @@ class ChatSession : public std::enable_shared_from_this<ChatSession> {
 public:
     using Ptr = std::shared_ptr<ChatSession>;
 
-    explicit ChatSession(tcp::socket&& socket);
+    explicit ChatSession(asio::io_context& context, tcp::socket&& socket);
 
     void start(MessageHandler onMessage, ErrorHandler onError);
 
@@ -27,6 +27,8 @@ private:
 
 private:
     tcp::socket _socket;
+    asio::io_context::strand _strandR;
+    asio::io_context::strand _strandW;
     asio::streambuf _buffer;
     std::queue<std::string> _outgoing;
     MessageHandler _onMessage;
