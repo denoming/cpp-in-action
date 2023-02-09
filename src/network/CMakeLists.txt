@@ -9,6 +9,7 @@ target_sources(${TARGET}
         src/Resolver.cpp
         src/ThreadPool.cpp
         src/Context.cpp
+        src/Timers.cpp
 )
 
 target_link_libraries(${TARGET}
