@@ -51,7 +51,7 @@ TEST(Context, PostJob)
 
     asio::post(context, []() {
         /* Do the job inside pooling loop */
-        std::cout << ">>> task (" << std::this_thread::get_id() << ")" << std::endl;
+        std::cout << ">>> Task (" << std::this_thread::get_id() << ")" << std::endl;
     });
 
     auto guard = asio::make_work_guard(context);
@@ -64,4 +64,22 @@ TEST(Context, PostJob)
 
     std::cout << ">>> Run context (" << std::this_thread::get_id() << ")" << std::endl;
     context.run();
+}
+
+TEST(Context, ManualPool)
+{
+    asio::io_context context;
+
+    asio::post(context, []() {
+        /* Do the job inside pooling loop */
+        std::cout << ">>> Task" << std::endl;
+    });
+
+    for (;;) {
+        if (context.poll() == 0) {
+            /* Do one task and exit */
+            std::cout << ">>> Exit" << std::endl;
+            break;
+        }
+    }
 }
