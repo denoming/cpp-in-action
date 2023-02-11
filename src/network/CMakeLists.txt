@@ -10,6 +10,7 @@ target_sources(${TARGET}
         src/ThreadPool.cpp
         src/Context.cpp
         src/Timers.cpp
+        src/Client.cpp
 )
 
 target_link_libraries(${TARGET}
