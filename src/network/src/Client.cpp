@@ -61,6 +61,7 @@ TEST(Client, AsyncConnect)
         std::cout << ">>> Read: " << error.message() << ", bytes = " << bytesTransferred << "\n\n";
         if (!error || error == asio::error::eof) {
             std::cout << std::istream{&buffer}.rdbuf();
+            buffer.consume(bytesTransferred);
         }
     };
     const auto onWrite = [&](const sys::error_code& error, std::size_t bytesTransferred) {
