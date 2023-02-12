@@ -1,31 +1,26 @@
 #include "TcpServer.hpp"
 
-TcpServer::TcpServer(net::io_context& context, net::ip::port_type port)
+#include "TcpSession.hpp"
+
+TcpServer::TcpServer(asio::io_context& context, std::uint16_t port)
     : _context{context}
-    , _acceptor{context, net::ip::tcp::endpoint{net::ip::tcp::v4(), port}}
+    , _acceptor{context, tcp::endpoint{tcp::v4(), port}}
 {
-    waitConnection();
+    accept();
 }
 
 void
-TcpServer::waitConnection()
+TcpServer::accept()
 {
     HANDLER_LOCATION;
 
-    auto connection = TcpSession::create(_context);
-    _acceptor.async_accept(connection->socket(), [this, connection](sys::error_code ec) {
-        onAcceptDone(connection, ec);
+    _socket.emplace(_context);
+
+    _acceptor.async_accept(*_socket, [this](const sys::error_code& error) {
+        HANDLER_LOCATION;
+        if (!error) {
+            std::make_shared<TcpSession>(std::move(*_socket))->start();
+        }
+        accept();
     });
-}
-
-void
-TcpServer::onAcceptDone(TcpSession::Ptr connection, sys::error_code ec)
-{
-    HANDLER_LOCATION;
-
-    if (!ec) {
-        connection->process();
-    }
-
-    waitConnection();
 }

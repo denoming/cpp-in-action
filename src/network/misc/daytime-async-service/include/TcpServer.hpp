@@ -1,20 +1,19 @@
 #pragma once
 
 #include "Common.hpp"
-#include "TcpSession.hpp"
+
+#include <optional>
 
 class TcpServer {
 public:
-    explicit TcpServer(net::io_context& context, net::ip::port_type port = 13);
+    explicit TcpServer(asio::io_context& context, std::uint16_t port = 13);
 
 private:
     void
-    waitConnection();
-
-    void
-    onAcceptDone(TcpSession::Ptr connection, sys::error_code ec);
+    accept();
 
 private:
-    net::io_context& _context;
-    net::ip::tcp::acceptor _acceptor;
+    asio::io_context& _context;
+    tcp::acceptor _acceptor;
+    std::optional<tcp::socket> _socket;
 };

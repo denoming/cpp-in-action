@@ -15,50 +15,30 @@ getDayTime()
 
 } // namespace
 
-TcpSession::TcpSession(net::io_context& context)
-    : _socket{context}
+TcpSession::TcpSession(tcp::socket&& socket)
+    : _socket{std::move(socket)}
 {
-}
-
-TcpSession::Ptr
-TcpSession::create(net::io_context& context)
-{
-    return std::shared_ptr<TcpSession>(new TcpSession{context});
-}
-
-net::ip::tcp::socket&
-TcpSession::socket()
-{
-    return _socket;
-}
-
-const net::ip::tcp::socket&
-TcpSession::socket() const
-{
-    return _socket;
 }
 
 void
-TcpSession::process()
+TcpSession::start()
 {
     _message.assign(getDayTime());
 
     HANDLER_LOCATION;
 
-    net::async_write(_socket,
-                     net::buffer(_message),
-                     [self = shared_from_this()](sys::error_code ec, std::size_t bytesWritten) {
-                         self->onWriteDone(ec, bytesWritten);
-                     });
+    asio::async_write(_socket,
+                      asio::buffer(_message),
+                      std::bind_front(&TcpSession::onWriteDone, shared_from_this()));
 }
 
 void
-TcpSession::onWriteDone(sys::error_code ec, std::size_t bytesWritten)
+TcpSession::onWriteDone(const sys::error_code& error, std::size_t bytesWritten)
 {
     HANDLER_LOCATION;
 
-    if (ec) {
-        std::cerr << "onWriteDone: " << ec.what();
+    if (error) {
+        std::cerr << "onWriteDone: " << error.message();
     } else {
         std::cout << "onWriteDone: " << bytesWritten << " bytes written" << std::endl;
     }

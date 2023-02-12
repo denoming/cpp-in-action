@@ -7,7 +7,7 @@
 namespace {
 
 std::string
-parseResponse(net::streambuf& buffer)
+parseResponse(asio::streambuf& buffer)
 {
     std::string dayTime;
     std::istream is{&buffer};
@@ -17,7 +17,7 @@ parseResponse(net::streambuf& buffer)
 
 } // namespace
 
-TcpClient::TcpClient(net::io_context& context)
+TcpClient::TcpClient(asio::io_context& context)
     : _socket{context}
 {
 }
@@ -25,13 +25,13 @@ TcpClient::TcpClient(net::io_context& context)
 void
 TcpClient::connect(std::string_view address, std::string_view port)
 {
-    net::ip::tcp::resolver resolver{_context};
+    tcp::resolver resolver{_context};
     const auto endpoints = resolver.resolve(address, port);
     if (endpoints.empty()) {
         throw std::runtime_error{"No address has been resolved"};
     }
 
-    auto endpoint = net::async_connect(_socket, endpoints, net::use_future);
+    auto endpoint = asio::async_connect(_socket, endpoints, asio::use_future);
     std::cout << "[TcpClient] connect...";
     endpoint.wait();
     std::cout << "done" << std::endl;
@@ -40,8 +40,8 @@ TcpClient::connect(std::string_view address, std::string_view port)
 std::string
 TcpClient::get()
 {
-    net::streambuf buffer;
-    auto length = net::async_read_until(_socket, buffer, '\n', net::use_future);
+    asio::streambuf buffer;
+    auto length = asio::async_read_until(_socket, buffer, '\n', asio::use_future);
     std::cout << "[TcpClient] read...";
     length.wait();
     std::cout << length.get() << " bytes" << std::endl;
