@@ -29,6 +29,35 @@ $ nc -l localhost 8080 < hello.http
 static std::string_view Host{"127.0.0.1"};
 static std::string_view Port{"80"};
 
+/* Custom matcher for .async_read_until() */
+class MyMatcher {
+public:
+    template<typename Iterator>
+    std::pair<Iterator, bool>
+    operator()(Iterator begin, Iterator end) const
+    {
+        std::size_t cnt{0};
+
+        Iterator it = begin;
+        while (it != end && cnt < 3) {
+            if (*it++ == 'X') {
+                cnt++;
+            }
+        }
+
+        if (cnt == 3) {
+            return {it, true};
+        } else {
+            return {end, false};
+        }
+    }
+};
+
+namespace boost::asio {
+template<>
+struct is_match_condition<MyMatcher> : public boost::true_type { };
+} // namespace boost::asio
+
 TEST(Client, Connect)
 {
     asio::io_context context;
@@ -50,9 +79,8 @@ TEST(Client, AsyncConnect)
 {
     asio::io_context context;
     tcp::socket socket{context};
-    tcp::resolver resolver{context};
 
-    asio::streambuf buffer;
+    asio::streambuf buffer{1024 /* Prevent growing buffer too much */};
     const std::string request = "GET / HTTP/1.1\n"
                                 "Host: 127.0.0.1\n"
                                 "Connection: close\n\n";
@@ -61,6 +89,7 @@ TEST(Client, AsyncConnect)
         std::cout << ">>> Read: " << error.message() << ", bytes = " << bytesTransferred << "\n\n";
         if (!error || error == asio::error::eof) {
             std::cout << std::istream{&buffer}.rdbuf();
+            /* Do .consume() after we read prepared data */
             buffer.consume(bytesTransferred);
         }
     };
@@ -68,13 +97,27 @@ TEST(Client, AsyncConnect)
         std::cout << ">>> Write: " << error.message() << ", bytes = " << bytesTransferred
                   << std::endl;
         if (!error) {
-            asio::async_read_until(socket, buffer, "XXX", onRead);
+            /* Read data into dynamic buffer (.prepare() + .commit() will be made internally) */
+            asio::async_read_until(socket, buffer, MyMatcher{}, onRead);
         }
     };
     const auto onConnect = [&](const sys::error_code& error, const tcp::endpoint& endpoint) {
         std::cout << ">>> Connect: " << error.message() << ", endpoint = " << endpoint << std::endl;
         if (!error) {
-            asio::async_write(socket, asio::buffer(request), onWrite);
+            /* Do .prepare() + .commit() steps to prepare data to write into socket */
+            auto view = buffer.prepare(256);
+            std::memcpy(view.data(), request.data(), request.size());
+            buffer.commit(request.size());
+            /**
+             * Write data into socket (.consume() will be made internally).
+             *
+             * Three default completion conditions are available:
+             *  + transfer_all
+             *  + transfer_at_least
+             *  + transfer_exactly
+             * Custom completion condition can be made.
+             */
+            asio::async_write(socket, buffer, asio::transfer_all(), onWrite);
         }
     };
     const auto onResolve
@@ -85,6 +128,7 @@ TEST(Client, AsyncConnect)
               }
           };
 
+    tcp::resolver resolver{context};
     resolver.async_resolve("127.0.0.1", "8080", onResolve);
 
     context.run();
