@@ -11,6 +11,7 @@ target_sources(${TARGET}
         src/Context.cpp
         src/Timers.cpp
         src/Client.cpp
+        src/Buffer.cpp
 )
 
 target_link_libraries(${TARGET}
