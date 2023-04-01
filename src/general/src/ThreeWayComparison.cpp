@@ -88,13 +88,9 @@ Comparison Categories:
        Example: integral types or strings.
     2. All equivalent values of T are indistinguishable
        (Equivalence)
-       Example: Comparing absolute value of signed integral types or string case-insensitive.
     3. All values of T are comparable. For arbitrary values a and b of T,
        one of the three relations a < b, a == b , and a > b must be true
        (Comparable)
-       Example: Comparing two arbitrary floating-point values need not be comparable, a = 5.5 and
-                b = NaN, neither of the following expressions returns true: a < NaN, a == NaN,
-                a > NaN.
 
 |---------------------------------------------------------------------------|
 | Comparison Category	Relational Operator  |  Equivalence    | Comparable |
@@ -103,6 +99,11 @@ Comparison Categories:
 | Weak Ordering	yes	yes                  |                 |  yes       |
 | Partial Ordering	yes                  |                 |            |
 |---------------------------------------------------------------------------|
+
+ Weak ordering: comparing the absolute value of signed integral types or string case-insensitive
+   (strong ordering determines the identity of values but weak ordering the equivalence)
+ Partial ordering: comparing two values need not be comparable for a = 5.5 and b = NaN
+   (neither of the following expressions return true: a < NaN, a < NaN, a == NaN)
 
 */
 
