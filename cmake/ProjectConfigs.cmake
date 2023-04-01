@@ -21,3 +21,4 @@ if(MCPP_ENABLE_PARALLEL)
 endif()
 
 include(AddBoost)
+include(AddFmt)

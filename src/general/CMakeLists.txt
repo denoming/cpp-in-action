@@ -37,12 +37,15 @@ PRIVATE
     src/Ranges.cpp
     src/Span.cpp
     src/Bits.cpp
+    src/Chrono.cpp
 )
 
 target_link_libraries(${TARGET}
 PRIVATE
     ${PROJECT_NAME}::common
-    GTest::gtest_main GTest::gmock_main
+    GTest::gtest_main
+    GTest::gmock_main
+    fmt::fmt
 )
 
 if (NOT CMAKE_CROSSCOMPILING)
