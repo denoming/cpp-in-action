@@ -34,6 +34,9 @@ PRIVATE
     src/ThreeWayComparison.cpp
     src/Attributes.cpp
     src/Concepts.cpp
+    src/Ranges.cpp
+    src/Span.cpp
+    src/Bits.cpp
 )
 
 target_link_libraries(${TARGET}
