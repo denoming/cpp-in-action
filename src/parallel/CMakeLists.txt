@@ -6,6 +6,8 @@ target_sources(${TARGET}
 PRIVATE
     src/ParallelAlgorithms.cpp
     src/Singleton.cpp
+    src/Atomic.cpp
+    src/Fences.cpp
 )
 
 target_link_libraries(${TARGET}
