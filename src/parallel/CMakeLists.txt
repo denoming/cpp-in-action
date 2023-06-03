@@ -9,6 +9,7 @@ PRIVATE
     src/Atomic.cpp
     src/Fences.cpp
     src/Thread.cpp
+    src/ThreadLocal.cpp
     src/Lock.cpp
     src/Initialization.cpp
 )
