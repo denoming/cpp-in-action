@@ -12,6 +12,7 @@ PRIVATE
     src/ThreadLocal.cpp
     src/Lock.cpp
     src/Initialization.cpp
+    src/Conditional.cpp
 )
 
 target_link_libraries(${TARGET}
