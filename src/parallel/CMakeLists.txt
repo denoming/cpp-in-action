@@ -9,6 +9,7 @@ PRIVATE
     src/Atomic.cpp
     src/Fences.cpp
     src/Thread.cpp
+    src/Lock.cpp
 )
 
 target_link_libraries(${TARGET}
