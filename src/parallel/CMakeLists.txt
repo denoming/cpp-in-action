@@ -8,6 +8,7 @@ PRIVATE
     src/Singleton.cpp
     src/Atomic.cpp
     src/Fences.cpp
+    src/Thread.cpp
 )
 
 target_link_libraries(${TARGET}
