@@ -10,6 +10,7 @@ PRIVATE
     src/Fences.cpp
     src/Thread.cpp
     src/Lock.cpp
+    src/Initialization.cpp
 )
 
 target_link_libraries(${TARGET}
