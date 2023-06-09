@@ -14,6 +14,8 @@ PRIVATE
     src/Initialization.cpp
     src/Conditional.cpp
     src/Semaphore.cpp
+    src/Latch.cpp
+    src/Barrier.cpp
 )
 
 target_link_libraries(${TARGET}
