@@ -13,6 +13,7 @@ PRIVATE
     src/Lock.cpp
     src/Initialization.cpp
     src/Conditional.cpp
+    src/Semaphore.cpp
 )
 
 target_link_libraries(${TARGET}
