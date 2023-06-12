@@ -3,16 +3,15 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <iostream>
 #include <filesystem>
 #include <execution>
 #include <vector>
 #include <cmath>
 
-namespace fs = std::filesystem;
+using namespace testing;
 
-using ::testing::Each;
-using ::testing::Field;
-using ::testing::Ne;
+namespace fs = std::filesystem;
 
 struct Data {
     Data(double value, double sqrt)
@@ -25,7 +24,7 @@ struct Data {
     double sqrt;
 };
 
-TEST(ParallelAlgorithmsTest, ForEach)
+TEST(ParallelAlgorithms, ForEach)
 {
     constexpr int NumOfElements = 1'000'000;
 
@@ -50,7 +49,7 @@ TEST(ParallelAlgorithmsTest, ForEach)
     EXPECT_THAT(elems, Each(Field(&Data::sqrt, Ne(0.0))));
 }
 
-TEST(ParallelAlgorithmsTest, DISABLED_Path)
+TEST(ParallelAlgorithms, DISABLED_Path)
 {
     static const fs::path root{"<path>"};
     EXPECT_NO_THROW({
@@ -69,4 +68,81 @@ TEST(ParallelAlgorithmsTest, DISABLED_Path)
 
         EXPECT_THAT(size, Ne(0));
     });
+}
+
+TEST(ParallelAlgorithms, Accumulate)
+{
+    constexpr int NumOfElements = 1'000'000;
+    std::vector<double> nums(NumOfElements, 0);
+    std::iota(nums.begin(), nums.end(), 1L);
+
+    Timer t;
+    std::cout << "Value (SEQ): "
+              << std::accumulate(nums.begin(), nums.end(), 1.0, [](double a, double b) {
+                     return std::sqrt(a) + std::sqrt(b);
+                 });
+    std::cout << " (time: " << t.diff() << ")" << std::endl;
+}
+
+TEST(ParallelAlgorithms, Reduce)
+{
+    constexpr int NumOfElements = 1'000'000;
+    std::vector<double> nums(NumOfElements, 0);
+    std::iota(nums.begin(), nums.end(), 1L);
+
+    /* The behaviour is non-deterministic as Fn is not associative and not commutative */
+    const auto Fn = [](double a, double b) { return std::sqrt(a) + std::sqrt(b); };
+
+    Timer t1;
+    std::reduce(std::execution::seq, nums.begin(), nums.end(), 1.0, Fn);
+    std::cout << "Reduce (SEQ): " << t1.diff() << "\n";
+
+    Timer t2;
+    std::reduce(std::execution::par, nums.begin(), nums.end(), 1.0, Fn);
+    std::cout << "Reduce (PAR): " << t2.diff() << "\n";
+}
+
+TEST(ParallelAlgorithms, ReduceString)
+{
+    std::vector<std::string> in{"1", "2", "3", "4", "5"};
+    const auto result
+        = std::reduce(in.begin(), in.end(), std::string{"INITIAL"}, [](auto&& s1, auto&& s2) {
+              std::cout << "> " << s1 << " | " << s2 << std::endl;
+              return s1 + ":" + s2;
+          });
+    std::cout << "Result: " << result << std::endl;
+}
+
+TEST(ParallelAlgorithms, ExclusiveScan)
+{
+    std::vector<int> in{1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    std::vector<int> out;
+    std::exclusive_scan(
+        std::execution::par, in.begin(), in.end(), std::back_inserter(out), 0, [](int n1, int n2) {
+            return n1 + n2;
+        });
+
+    std::cout << "std::exclusive_scan: ";
+    for (auto v : out) {
+        std::cout << v << " ";
+    }
+    std::cout << '\n';
+}
+
+TEST(ParallelAlgorithms, InclusiveScan)
+{
+    std::vector<int> in{1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    std::vector<int> out;
+    std::inclusive_scan(
+        std::execution::par, in.begin(), in.end(), std::back_inserter(out), [](int n1, int n2) {
+            return n1 + n2;
+        });
+
+    std::cout << "std::exclusive_scan: ";
+    for (auto v : out) {
+        std::cout << v << " ";
+    }
+    std::cout << '\n';
 }
