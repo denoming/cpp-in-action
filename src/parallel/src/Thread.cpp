@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <random>
 #include <list>
 #include <future>
 #include <thread>
@@ -185,8 +186,11 @@ consumer(std::stop_token stoken)
         if (rv) {
             std::cout << "Receive data\n";
             dataReady.store(false);
-        } else {
+            continue;
+        }
+        if (stoken.stop_requested()) {
             std::cout << "Stop has been requested\n";
+            continue;
         }
         std::this_thread::sleep_for(0.2s);
     }
@@ -214,8 +218,84 @@ TEST(Thread, InteraptionByCondition)
     std::jthread t2{&producer, ss.get_token()};
 
     /* Give some time to work */
-    std::this_thread::sleep_for(3s);
+    std::this_thread::sleep_for(1s);
 
     /* Stop both threads */
     ss.request_stop();
+}
+
+//--------------------------------------------------------------------------------------------------
+
+TEST(Thread, UsingAsync)
+{
+    namespace krn = std::chrono;
+
+    auto begin = krn::system_clock::now();
+
+    auto asyncLazy = std::async(std::launch::deferred, []() { return krn::system_clock::now(); });
+    auto asyncEager = std::async(std::launch::async, []() { return krn::system_clock::now(); });
+
+    std::this_thread::sleep_for(krn::seconds{1});
+
+    auto lazyDur = krn::duration<double>(asyncLazy.get() - begin).count();
+    auto eagerDur = krn::duration<double>(asyncEager.get() - begin).count();
+
+    // clang-format off
+    std::cout << std::fixed << std::setprecision(10)
+              << "asyncLazy evaluated after: " << lazyDur << '\n'
+              << "asyncEager evaluated after: " << eagerDur << '\n';
+    // clang-format on
+}
+
+//--------------------------------------------------------------------------------------------------
+
+TEST(Thread, UsingFireAndForgetAsync)
+{
+    std::async(std::launch::async, []() {
+        std::this_thread::sleep_for(1s);
+        std::cout << "(1) done\n";
+    });
+
+    std::async(std::launch::async, []() {
+        std::this_thread::sleep_for(1s);
+        std::cout << "(2) done\n";
+    });
+
+    std::cout << "We are here\n";
+}
+
+//--------------------------------------------------------------------------------------------------
+
+static long long
+getDotProduct(std::vector<int>& v, std::vector<int>& w)
+{
+    const auto size = v.size();
+    auto f1 = std::async(std::launch::async,
+                         [&]() { return std::inner_product(&v[0], &v[size / 4], &w[0], 0LL); });
+    auto f2 = std::async(std::launch::async, [&]() {
+        return std::inner_product(&v[size / 4], &v[size / 2], &w[size / 4], 0LL);
+    });
+    auto f3 = std::async(std::launch::async, [&]() {
+        return std::inner_product(&v[size / 2], &v[size * 3 / 4], &w[size / 2], 0LL);
+    });
+    auto f4 = std::async(std::launch::async, [&]() {
+        return std::inner_product(&v[size * 3 / 4], &v[size], &w[size * 3 / 4], 0LL);
+    });
+    return f1.get() + f2.get() + f3.get() + f4.get();
+}
+
+TEST(Thread, AsyncDistribution)
+{
+    std::random_device seed;
+    std::mt19937 engine{seed()};
+    std::uniform_int_distribution<int> provider{0, 1000};
+
+    std::vector<int> v, w;
+    v.reserve(1000), w.reserve(1000);
+    for (int i = 0; i < 1000; ++i) {
+        v.push_back(provider(engine));
+        w.push_back(provider(engine));
+    }
+
+    std::cout << "getDotProduct(v, w) = " << getDotProduct(v, w) << "\n";
 }
