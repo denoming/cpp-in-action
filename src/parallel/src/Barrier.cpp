@@ -4,23 +4,13 @@
 #include <mutex>
 #include <barrier>
 #include <thread>
+#include <syncstream>
 
 using namespace std::literals;
 
-static std::mutex coutGuard;
-
-static void
-log(const std::string& line)
-{
-    std::lock_guard lock{coutGuard};
-    std::cout << line;
-}
-
 //--------------------------------------------------------------------------------------------------
 
-static std::barrier workDone{6, [](){
-    log("Complete!\n");
-}};
+static std::barrier workDone{6, []() { std::osyncstream{std::cout} << "Complete!\n"; }};
 
 class FullTimeWorker {
 public:
@@ -32,9 +22,11 @@ public:
     void
     operator()()
     {
-        log(_name + ": Morning work is done\n");
+        // log(_name + ": Morning work is done\n");
+        std::osyncstream{std::cout} << _name << ": Morning work is done\n";
         workDone.arrive_and_wait();
-        log(_name + ": Afternoon work is done\n");
+        // log(_name + ": Afternoon work is done\n");
+        std::osyncstream{std::cout} << _name << ": Afternoon work is done\n";
         workDone.arrive_and_wait();
     }
 
@@ -52,7 +44,8 @@ public:
     void
     operator()()
     {
-        log(_name + ": Morning work is done\n");
+        // log(_name + ": Morning work is done\n");
+        std::osyncstream{std::cout} << _name << ": Morning work is done\n";
         workDone.arrive_and_drop();
     }
 
@@ -62,7 +55,7 @@ private:
 
 TEST(Barrier, Workers)
 {
-    log("Start Working\n");
+    std::osyncstream{std::cout} << "Start Working\n";
     std::jthread t1{FullTimeWorker{"Full time worker 1"}};
     std::jthread t2{FullTimeWorker{"Full time worker 2"}};
     std::jthread t3{FullTimeWorker{"Full time worker 3"}};
