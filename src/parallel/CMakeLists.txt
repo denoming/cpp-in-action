@@ -16,6 +16,7 @@ PRIVATE
     src/Semaphore.cpp
     src/Latch.cpp
     src/Barrier.cpp
+    src/DiningPhilosophersProblem.cpp
 )
 
 target_link_libraries(${TARGET}
