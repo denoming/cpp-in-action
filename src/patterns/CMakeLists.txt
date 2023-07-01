@@ -7,6 +7,7 @@ PRIVATE
     src/Singleton.cpp
     src/StrategizedLocking.cpp
     src/ThreadSafeInterface.cpp
+    src/ActiveObject.cpp
 )
 
 target_link_libraries(${TARGET}
