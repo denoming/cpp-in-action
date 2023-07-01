@@ -1,0 +1,54 @@
+
+#include <mutex>
+
+/* Use NVI (Non-Virtual Interface) to define thread safe interface */
+class ThreadSafeInterface {
+public:
+    virtual ~ThreadSafeInterface() = default;
+
+    void
+    method1()
+    {
+        std::lock_guard lock{_mutex};
+        onMethod1();
+    }
+
+    void
+    method2()
+    {
+        std::lock_guard lock{_mutex};
+        onMethod2();
+    }
+
+private:
+    virtual void
+    onMethod1()
+    {
+        // No implementation
+    }
+
+    virtual void
+    onMethod2()
+    {
+        // No implementation
+    }
+
+private:
+    mutable std::mutex _mutex;
+};
+
+/* Use thread safe interface in derived class with particular implementation */
+class Derived1 final : public ThreadSafeInterface {
+private:
+    void
+    onMethod1() final
+    {
+        // Some implementation
+    }
+
+    void
+    onMethod2() final
+    {
+        // Some implementation
+    }
+};

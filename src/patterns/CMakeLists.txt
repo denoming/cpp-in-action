@@ -5,7 +5,8 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
 PRIVATE
     src/Singleton.cpp
-        src/StrategizedLocking.cpp
+    src/StrategizedLocking.cpp
+    src/ThreadSafeInterface.cpp
 )
 
 target_link_libraries(${TARGET}
