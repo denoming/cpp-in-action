@@ -281,17 +281,37 @@ template<>
 struct Other<std::vector<int>>;
 
 template<typename T>
-concept TypeRequirement
-    = requires {
-          typename T::value_type; // Requires that type T has a nested member 'value_type'
-          typename Other<T>;      // Requires that Other<T> can be instantiated
-      };
+concept TypeRequirement1 = requires {
+    typename T::value_type; // Requires that type T has a nested member 'value_type'
+    typename Other<T>;      // Requires that Other<T> can be instantiated
+};
+
+template<typename T>
+concept TypeRequirement2 = requires(T t) {
+    t.call(); /* Requires the type has method 'call' */
+};
+
+static void
+call(TypeRequirement2 auto object)
+{
+    object.call();
+}
+
+struct MyObject {
+    void
+    call()
+    {
+    }
+};
 
 TEST(Concepts, TypeRequirements)
 {
-    TypeRequirement auto v1{std::vector<int>{1, 2, 3}};
+    TypeRequirement1 auto t1{std::vector<int>{1, 2, 3}};
     // Not satisfied
     // TypeRequirement auto v2{5};
+
+    MyObject object;
+    call(object);
 }
 
 // Compound requirements
