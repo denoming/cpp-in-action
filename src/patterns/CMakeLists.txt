@@ -8,6 +8,7 @@ PRIVATE
     src/StrategizedLocking.cpp
     src/ThreadSafeInterface.cpp
     src/ActiveObject.cpp
+    src/MonitorObject.cpp
 )
 
 target_link_libraries(${TARGET}
