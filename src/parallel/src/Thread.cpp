@@ -152,7 +152,7 @@ TEST(Thread, CooperativeInteraption)
     std::jthread t1{&fn5, ss.get_token() /* Provide stop token */, "T1"};
     std::jthread t2{&fn5, ss.get_token() /* Provide stop token */, "T2"};
 
-    auto f1 = std::async(std::launch::async, [stoken = ss.get_token() /* Provide stop token */]() {
+    [[maybe_unused]] auto f1 = std::async(std::launch::async, [stoken = ss.get_token() /* Provide stop token */]() {
         std::osyncstream scout{std::cout};
         while (true) {
             scout << "Tick: (async)" << std::endl;
@@ -251,12 +251,12 @@ TEST(Thread, UsingAsync)
 
 TEST(Thread, UsingFireAndForgetAsync)
 {
-    std::async(std::launch::async, []() {
+    [[maybe_unused]] auto f1 = std::async(std::launch::async, []() {
         std::this_thread::sleep_for(1s);
         std::cout << "(1) done\n";
     });
 
-    std::async(std::launch::async, []() {
+    [[maybe_unused]] auto f2 = std::async(std::launch::async, []() {
         std::this_thread::sleep_for(1s);
         std::cout << "(2) done\n";
     });
