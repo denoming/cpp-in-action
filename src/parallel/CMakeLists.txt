@@ -16,6 +16,7 @@ PRIVATE
     src/Latch.cpp
     src/Barrier.cpp
     src/DiningPhilosophersProblem.cpp
+    src/LockFreeStack.cpp
 )
 
 target_link_libraries(${TARGET}
