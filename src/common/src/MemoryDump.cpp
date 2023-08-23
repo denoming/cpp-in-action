@@ -1,11 +1,11 @@
-#include "common/MemoryDumper.hpp"
+#include "common/MemoryDump.hpp"
 
 #include <string>
 
 #include <boost/format.hpp>
 
 void
-MemoryDumper::dump(void* ptr, std::size_t size, std::ostream& out)
+MemoryDump::dump(void* ptr, std::size_t size, std::ostream& out)
 {
     auto iptr = reinterpret_cast<std::size_t>(ptr);
 

@@ -8,7 +8,7 @@ PUBLIC
     include/common/HeapMemoryTracker.hpp
     include/common/Timer.h
     include/common/MemoryResourcesTracker.hpp
-    include/common/MemoryDumper.hpp
+    include/common/MemoryDump.hpp
 PRIVATE
     src/HeapMemoryTracker.cpp
     src/MemoryResourcesTracker.cpp

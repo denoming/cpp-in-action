@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "common/HeapMemoryTracker.hpp"
-#include "common/MemoryDumper.hpp"
+#include "common/MemoryDump.hpp"
 
 #include <boost/format.hpp>
 #include <boost/mpl/assert.hpp>
@@ -121,7 +121,7 @@ TEST(NewDeleteOperators, BadCaseOfAlignment)
 
     std::cout << "Bad case of alignment:\n";
     Data1* pData = new (memory) Data1{};
-    MemoryDumper::dump(pData, sizeof(Data1));
+    MemoryDump::dump(pData, sizeof(Data1));
     pData->~Data1();
 }
 
@@ -132,7 +132,7 @@ TEST(NewDeleteOperators, GoodCaseOfAlignment)
 
     std::cout << "Good case of alignment:\n";
     Data2* pData = new (memory) Data2;
-    MemoryDumper::dump(pData, sizeof(Data2));
+    MemoryDump::dump(pData, sizeof(Data2));
     pData->~Data2();
 }
 
@@ -166,7 +166,7 @@ TEST(NewDeleteOperators, CustomAlignment)
     std::cout << boost::format(format2.data()) % reinterpret_cast<void*>(memory + offset);
     std::cout << boost::format(format3.data()) % ptr;
     std::cout << boost::format(format4.data()) % boundary<16>::unalign(ptr);
-    MemoryDumper::dump(memory, realSize);
+    MemoryDump::dump(memory, realSize);
 
     // Destruct object
     ptr->~Data1();
