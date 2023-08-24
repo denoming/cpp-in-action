@@ -1,9 +1,13 @@
-set(TARGET "coro-echo-service")
+set(TARGET "asio-file-exchange-service")
+
+find_package(Threads REQUIRED)
 
 add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
+        src/TcpClient.cpp
+        src/TcpServer.cpp
         src/Service.cpp
 )
 
@@ -12,8 +16,8 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
-    PRIVATE Boost::headers
-            fmt::fmt
+    PUBLIC Threads::Threads
+    PRIVATE Boost::headers Boost::program_options
 )
 
 target_compile_definitions(${TARGET}

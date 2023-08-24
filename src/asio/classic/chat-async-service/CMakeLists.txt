@@ -1,4 +1,4 @@
-set(TARGET "udp-sync-service")
+set(TARGET "asio-chat-async-service")
 
 find_package(Threads REQUIRED)
 
@@ -7,6 +7,9 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
     PRIVATE
         src/Service.cpp
+        src/ChatServer.cpp
+        src/ChatSession.cpp
+        src/Runner.cpp
 )
 
 target_include_directories(${TARGET}

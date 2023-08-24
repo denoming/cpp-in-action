@@ -1,7 +1,7 @@
 add_subdirectory(common)
 add_subdirectory(general)
 add_subdirectory(idioms)
-add_subdirectory(network)
+add_subdirectory(asio)
 if(MCPP_ENABLE_PARALLEL)
     add_subdirectory(parallel)
 endif()
