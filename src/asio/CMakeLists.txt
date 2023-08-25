@@ -10,3 +10,4 @@ add_subdirectory(classic/chat-async-service)
 add_subdirectory(classic/tcp-echo-service)
 
 add_subdirectory(coro/echo-service)
+add_subdirectory(coro/primitives)
