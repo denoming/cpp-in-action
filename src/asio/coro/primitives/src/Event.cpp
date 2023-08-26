@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include <boost/asio.hpp>
-#include <fmt/format.h>
 
 #include <thread>
 #include <atomic>
@@ -12,7 +10,7 @@ using namespace testing;
 namespace io = boost::asio;
 namespace sys = boost::system;
 
-class AsyncEvent {
+class Event {
 public:
     enum State { NotSet, Pending, Set };
 
@@ -46,21 +44,21 @@ private:
     std::move_only_function<void()> _handler;
 };
 
-class AsyncEventTest : public TestWithParam<std::size_t> {
+class EventTest : public TestWithParam<std::size_t> {
 public:
 };
 
-INSTANTIATE_TEST_SUITE_P(Coroutines, AsyncEventTest, testing::Values(1'000, 10'000));
+INSTANTIATE_TEST_SUITE_P(Coroutines, EventTest, testing::Values(1'000, 10'000));
 
-TEST_P(AsyncEventTest, Test)
+TEST_P(EventTest, Test)
 {
     io::thread_pool pool{2};
     io::any_io_executor executor1 = pool.get_executor();
     io::any_io_executor executor2 = pool.get_executor();
 
     for (std::size_t n = 0; n < GetParam(); ++n) {
-        AsyncEvent event1;
-        AsyncEvent event2;
+        Event event1;
+        Event event2;
         std::atomic<bool> flag1{false};
         std::atomic<bool> flag2{false};
 

@@ -4,7 +4,7 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
-        src/AsyncEvent.cpp
+        src/Event.cpp
 )
 
 target_include_directories(${TARGET}
