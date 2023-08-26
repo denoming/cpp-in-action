@@ -1,4 +1,4 @@
-set(TARGET "asio-tcp-async-service")
+set(TARGET "asio-udp-sync")
 
 find_package(Threads REQUIRED)
 
@@ -6,10 +6,6 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
-        src/TcpAsyncAcceptor.cpp
-        src/TcpAsyncClient.cpp
-        src/TcpAsyncServer.cpp
-        src/TcpAsyncService.cpp
         src/Service.cpp
 )
 
@@ -19,5 +15,10 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
     PUBLIC Threads::Threads
-    PRIVATE Boost::headers Boost::program_options
+    PRIVATE Boost::headers
+)
+
+target_compile_definitions(${TARGET}
+    PRIVATE -DBOOST_ASIO_ENABLE_HANDLER_TRACKING
+            -DBOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 )

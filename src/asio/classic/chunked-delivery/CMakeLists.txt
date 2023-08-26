@@ -1,4 +1,4 @@
-set(TARGET "asio-chat-async-service")
+set(TARGET "asio-chunked-delivery")
 
 find_package(Threads REQUIRED)
 
@@ -6,10 +6,9 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
+        src/TcpClient.cpp
+        src/TcpServer.cpp
         src/Service.cpp
-        src/ChatServer.cpp
-        src/ChatSession.cpp
-        src/Runner.cpp
 )
 
 target_include_directories(${TARGET}
@@ -18,7 +17,7 @@ target_include_directories(${TARGET}
 
 target_link_libraries(${TARGET}
     PUBLIC Threads::Threads
-    PRIVATE Boost::headers
+    PRIVATE Boost::headers Boost::program_options
 )
 
 target_compile_definitions(${TARGET}

@@ -1,4 +1,4 @@
-set(TARGET "asio-daytime-async-service")
+set(TARGET "asio-daytime-async")
 
 find_package(Threads REQUIRED)
 

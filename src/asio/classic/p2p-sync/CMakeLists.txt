@@ -1,4 +1,4 @@
-set(TARGET "asio-file-exchange-service")
+set(TARGET "asio-p2p-sync")
 
 find_package(Threads REQUIRED)
 
@@ -18,9 +18,4 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
     PUBLIC Threads::Threads
     PRIVATE Boost::headers Boost::program_options
-)
-
-target_compile_definitions(${TARGET}
-    PRIVATE -DBOOST_ASIO_ENABLE_HANDLER_TRACKING
-            -DBOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 )

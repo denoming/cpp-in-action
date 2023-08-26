@@ -1,4 +1,4 @@
-set(TARGET "asio-tcp-sync-service")
+set(TARGET "asio-tcp-async")
 
 find_package(Threads REQUIRED)
 
@@ -6,10 +6,10 @@ add_executable(${TARGET} "")
 
 target_sources(${TARGET}
     PRIVATE
-        src/TcpSyncClient.cpp
-        src/TcpSyncAcceptor.cpp
-        src/TcpSyncService.cpp
-        src/TcpSyncServer.cpp
+        src/TcpAsyncAcceptor.cpp
+        src/TcpAsyncClient.cpp
+        src/TcpAsyncServer.cpp
+        src/TcpAsyncService.cpp
         src/Service.cpp
 )
 
