@@ -10,4 +10,5 @@ add_subdirectory(classic/tcp-sync)
 add_subdirectory(classic/udp-sync)
 
 add_subdirectory(coro/echo-service)
+add_subdirectory(coro/chunked-delivery)
 add_subdirectory(coro/primitives)
