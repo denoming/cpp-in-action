@@ -5,6 +5,7 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
     PRIVATE
         src/Event.cpp
+        src/DataChannel.cpp
 )
 
 target_include_directories(${TARGET}
@@ -16,5 +17,4 @@ target_link_libraries(${TARGET}
             fmt::fmt
             GTest::gtest_main
             GTest::gmock_main
-            ThreadSanitizer
 )
