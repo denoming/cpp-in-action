@@ -17,7 +17,8 @@ public:
     io::awaitable<void>
     wait(io::any_io_executor executor)
     {
-        auto initiate = [this, executor](io::completion_token_for<void()> auto&& handler) mutable {
+        auto initiate = [this,
+                         executor](io::completion_handler_for<void()> auto&& handler) mutable {
             _handler = [executor, handler = std::forward<decltype(handler)>(handler)]() mutable {
                 io::post(executor, std::move(handler));
             };
