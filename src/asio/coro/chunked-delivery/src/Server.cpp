@@ -1,9 +1,12 @@
 #include "Server.hpp"
 
 #include <fmt/format.h>
+#include <fmt/std.h>
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
+    using Channel = ioe::channel<void(sys::error_code, io::const_buffer)>;
+
     explicit Session(tcp::socket&& socket)
         : _stream{std::move(socket)}
     {
@@ -12,19 +15,31 @@ public:
     void
     run()
     {
+        auto channel = std::make_shared<Channel>(io::make_strand(_stream.get_executor()));
+
         io::co_spawn(
-            _stream.get_executor(),
-            [self = shared_from_this()]() {
-                fmt::print("Session: Spawn coroutine\n");
-                return self->doRun();
+            channel->get_executor(),
+            [self = shared_from_this(), channel]() {
+                fmt::print("Session: Spawn producer\n");
+                return self->producer(*channel);
+            },
+            io::detached);
+
+        io::co_spawn(
+            channel->get_executor(),
+            [self = shared_from_this(), channel]() {
+                fmt::print("Session: Spawn consumer\n");
+                return self->consumer(*channel);
             },
             io::detached);
     }
 
 private:
     io::awaitable<void>
-    doRun()
+    producer(Channel& channel)
     {
+        fmt::print(stderr, "Thread: {}\n", std::this_thread::get_id());
+
         beast::flat_buffer buffer;
         http::request_parser<http::empty_body> reqPar;
         co_await http::async_read_header(_stream, buffer, reqPar, io::use_awaitable);
@@ -41,12 +56,12 @@ private:
 
         std::string chunk;
         auto onHeader = [&](std::uint64_t size, std::string_view extensions, sys::error_code& ec) {
-            fmt::print("Server: Header chunk ({})\n", size);
+            fmt::print(stderr, "Server: Header chunk ({})\n", size);
             chunk.reserve(size);
             chunk.clear();
         };
         auto onBody = [&](std::uint64_t remain, std::string_view body, sys::error_code& ec) {
-            fmt::print("Server: Body chunk ({})\n", body.size());
+            fmt::print(stderr, "Server: Body chunk ({})\n", body.size());
             if (remain == body.size()) {
                 ec = http::error::end_of_chunk;
             }
@@ -57,29 +72,48 @@ private:
         reqPar.on_chunk_body(onBody);
 
         sys::error_code ec;
-        std::string chunks;
         while (!reqPar.is_done()) {
-            fmt::print("Server: Read chunk\n");
+            fmt::print(stderr, "Server: Read chunk\n");
             co_await http::async_read(
                 _stream, buffer, reqPar, io::redirect_error(io::use_awaitable, ec));
             if (not ec) {
                 continue;
             } else {
                 if (ec != http::error::end_of_chunk) {
-                    fmt::print("Error: {}\n", ec.message());
+                    fmt::print(stderr, "Error: {}\n", ec.message());
                     break;
                 } else {
-                    fmt::print("End of chunk\n");
+                    fmt::print(stderr, "End of chunk\n");
                     ec = {};
                 }
             }
-            fmt::print("Received chunk: {}\n", chunk);
-            chunks += chunk;
+            fmt::print(stderr, "Received chunk: {}\n", chunk);
+            co_await channel.async_send(sys::error_code{}, io::buffer(chunk), io::use_awaitable);
         }
 
-        fmt::print("Received chunks: {}\n", chunks);
+        co_await channel.async_send(http::error::end_of_stream, {}, io::use_awaitable);
+        channel.close();
+
         _stream.close();
         co_return;
+    }
+
+    io::awaitable<void>
+    consumer(Channel& channel)
+    {
+        std::string chunks;
+        sys::error_code ec;
+        while (channel.is_open()) {
+            auto buffer = co_await channel.async_receive(io::redirect_error(io::use_awaitable, ec));
+            if (ec) {
+                if (ec != http::error::end_of_stream) {
+                    fmt::print(stderr, "Error: {}\n", ec.message());
+                }
+                break;
+            }
+            chunks.append(static_cast<const char*>(buffer.data()), buffer.size());
+        }
+        fmt::print(stderr, "Chunks: {}\n", chunks);
     }
 
 private:

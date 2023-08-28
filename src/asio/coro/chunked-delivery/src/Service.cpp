@@ -38,16 +38,15 @@ main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    io::io_context context;
+    io::thread_pool context{2};
     if (runClient) {
         auto client = std::make_shared<Client>(context.get_executor(), host, port, data);
         client->send();
-        context.run();
     }
     if (runServer) {
         auto server = std::make_shared<Server>(context.get_executor());
         server->listen(8080);
-        context.run();
     }
+    context.join();
     return EXIT_SUCCESS;
 }
