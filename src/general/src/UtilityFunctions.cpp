@@ -10,7 +10,7 @@ using namespace testing;
 /* (1) For other cases */
 template<typename T>
 void
-printElems(const T& input)
+printElements(const T& input)
 {
     auto size{std::size(input)};
     std::cout << size << " elems: ";
@@ -23,7 +23,7 @@ printElems(const T& input)
 /* (2) For inline initializer list */
 template<typename T>
 void
-printElems(const std::initializer_list<T>& input)
+printElements(const std::initializer_list<T>& input)
 {
     auto size{std::size(input)};
     std::cout << size << " elems: ";
@@ -33,23 +33,23 @@ printElems(const std::initializer_list<T>& input)
     std::cout << std::endl;
 }
 
-TEST(UtilityFunctionsTest, Size)
+TEST(UtilityFunctions, Size)
 {
-    printElems({0, 3, 5, 4} /* (2) Inline initializer list */);
+    printElements({0, 3, 5, 4} /* (2) Inline initializer list */);
 
-    printElems("hello world" /* (1) Inline string array */);
+    printElements("hello world" /* (1) Inline string array */);
 
     std::array arr{27, 3, 5, 8, 7, 12, 22, 0, 55};
-    printElems(arr /* (1) */);
+    printElements(arr /* (1) */);
 
     std::vector v{0.0, 8.8, 15.15};
-    printElems(v /* (1) */);
+    printElements(v /* (1) */);
 
     std::initializer_list<std::string> il{"just", "five", "small", "string", "literals"};
-    printElems(il /* (1) */);
+    printElements(il /* (1) */);
 }
 
-TEST(UtilityFunctionsTest, EverySecond)
+TEST(UtilityFunctions, EverySecond)
 {
     std::vector<int> elems{8, 15, 7, 42};
 
@@ -64,7 +64,7 @@ TEST(UtilityFunctionsTest, EverySecond)
     printEverySend();
 }
 
-TEST(UtilityFunctionsTest, ClampValues)
+TEST(UtilityFunctions, ClampValues)
 {
     const auto predicate = [](auto a, auto b) { return std::abs(a) < std::abs(b); };
 
@@ -76,7 +76,7 @@ TEST(UtilityFunctionsTest, ClampValues)
     EXPECT_THAT(elems, ElementsAre(-7, 5, 8, 13));
 }
 
-TEST(UtilityFunctionsTest, SampleValues)
+TEST(UtilityFunctions, SampleValues)
 {
     std::vector<int> input;
     for (int i = 0; i < 100; ++i) {
@@ -89,4 +89,18 @@ TEST(UtilityFunctionsTest, SampleValues)
         input.cbegin(), input.cend(), std::back_insert_iterator{output}, 10, std::mt19937{rd()});
 
     EXPECT_THAT(output, Not(IsEmpty()));
+}
+
+TEST(UtilityFunctions, SampleString)
+{
+    static const std::size_t kLength{15};
+
+    std::string in{"ABCDEFGHIKLMNOPQRSTVXYZ"}, out;
+    std::sample(in.cbegin(),
+                in.cend(),
+                std::back_inserter(out),
+                kLength,
+                std::mt19937{std::random_device{}()});
+
+    EXPECT_THAT(out, Not(IsEmpty()));
 }
