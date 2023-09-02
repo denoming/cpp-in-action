@@ -5,7 +5,12 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
     PRIVATE
         src/Event.cpp
-        src/DataChannel.cpp
+)
+
+target_sources(${TARGET}
+    PRIVATE
+        src/EventTest.cpp
+        src/DataChannelTest.cpp
 )
 
 target_include_directories(${TARGET}
