@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Reactor.hpp"
+#include "patterns/Reactor.hpp"
 
 #include <iostream>
 #include <chrono>
