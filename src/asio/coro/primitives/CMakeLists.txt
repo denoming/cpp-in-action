@@ -22,4 +22,5 @@ target_link_libraries(${TARGET}
             fmt::fmt
             GTest::gtest_main
             GTest::gmock_main
+            ThreadSanitizer
 )
