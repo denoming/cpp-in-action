@@ -9,7 +9,8 @@ Event::wait(io::any_io_executor executor)
         };
 
         State oldState = State::NotSet;
-        if (not _state.compare_exchange_strong(oldState, State::Pending)) {
+        if (not _state.compare_exchange_strong(
+                oldState, State::Pending, std::memory_order_release, std::memory_order_relaxed)) {
             _handler();
         }
     };
@@ -26,7 +27,8 @@ Event::pending()
 void
 Event::set()
 {
-    if (State oldState = _state.exchange(State::Set); oldState == State::Pending) {
+    if (State oldState = _state.exchange(State::Set, std::memory_order_acquire);
+        oldState == State::Pending) {
         _handler();
     }
 }
@@ -34,7 +36,8 @@ Event::set()
 void
 Event::reset()
 {
-    if (State oldState = _state.exchange(State::NotSet); oldState == State::Pending) {
+    if (State oldState = _state.exchange(State::NotSet, std::memory_order_acquire);
+        oldState == State::Pending) {
         _handler();
     }
 }
