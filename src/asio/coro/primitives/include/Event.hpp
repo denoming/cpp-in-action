@@ -4,7 +4,7 @@
 
 class Event {
 public:
-    enum State { NotSet, Pending, Set };
+    enum State { NotSet, Waiting, Set };
 
     io::awaitable<void>
     wait(io::any_io_executor executor);
