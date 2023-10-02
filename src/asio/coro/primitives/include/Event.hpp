@@ -7,7 +7,7 @@ public:
     enum State { NotSet, Pending, Set };
 
     io::awaitable<void>
-    wait();
+    wait(io::any_io_executor executor);
 
     bool
     pending();

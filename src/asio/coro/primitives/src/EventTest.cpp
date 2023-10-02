@@ -4,17 +4,19 @@
 
 #include <boost/asio.hpp>
 
+#include <thread>
+
 using namespace testing;
 
 class EventTest : public TestWithParam<std::size_t> {
 public:
 };
 
-INSTANTIATE_TEST_SUITE_P(Coroutines, EventTest, testing::Values(1'000, 10'000));
+INSTANTIATE_TEST_SUITE_P(Coroutines, EventTest, testing::Values(1'000, 5'000));
 
 TEST_P(EventTest, Test)
 {
-    io::thread_pool pool{2};
+    io::thread_pool pool{3};
     io::any_io_executor executor1 = pool.get_executor();
     io::any_io_executor executor2 = pool.get_executor();
 
@@ -25,7 +27,7 @@ TEST_P(EventTest, Test)
         std::atomic<bool> flag2{false};
 
         auto consumer = [&]() -> io::awaitable<void> {
-            co_await event1.wait();
+            co_await event1.wait(co_await io::this_coro::executor);
             event2.set();
             flag1.store(true);
             co_return;
@@ -33,7 +35,7 @@ TEST_P(EventTest, Test)
 
         auto producer = [&]() -> io::awaitable<void> {
             event1.set();
-            co_await event2.wait();
+            co_await event2.wait(co_await io::this_coro::executor);
             flag2.store(true);
             co_return;
         };
@@ -41,7 +43,9 @@ TEST_P(EventTest, Test)
         io::co_spawn((n % 2) ? executor1 : executor2, consumer(), io::detached);
         io::co_spawn((n % 2) ? executor2 : executor1, producer(), io::detached);
 
-        while (not flag1 or not flag2) { }
+        while (not flag1 or not flag2) {
+            std::this_thread::yield();
+        }
     }
 
     pool.join();

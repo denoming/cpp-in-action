@@ -1,11 +1,11 @@
 #include "Event.hpp"
 
 io::awaitable<void>
-Event::wait()
+Event::wait(io::any_io_executor executor)
 {
-    auto initiate = [this](io::completion_handler_for<void()> auto&& handler) mutable {
-        _handler = [handler = std::forward<decltype(handler)>(handler)]() mutable {
-            io::post(io::get_associated_executor(handler), std::move(handler));
+    auto initiate = [this, executor](io::completion_handler_for<void()> auto&& handler) mutable {
+        _handler = [executor, handler = std::forward<decltype(handler)>(handler)]() mutable {
+            io::post(executor, std::move(handler));
         };
 
         State oldState = State::NotSet;

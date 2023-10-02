@@ -42,7 +42,7 @@ public:
         while (_needRecv > 0) {
             _recvEvent.reset();
             if (empty()) {
-                co_await _recvEvent.wait();
+                co_await _recvEvent.wait(_executor);
             }
             std::size_t recv = readBuffer(buffer);
             totalRecv += recv;
@@ -53,7 +53,7 @@ public:
                 if (not active() and empty()) {
                     co_return totalRecv;
                 } else {
-                    co_await _recvEvent.wait();
+                    co_await _recvEvent.wait(_executor);
                 }
             }
         }
@@ -72,7 +72,7 @@ public:
         while (_needSend > 0) {
             _sendEvent.reset();
             if (full()) {
-                co_await _recvEvent.wait();
+                co_await _recvEvent.wait(_executor);
             }
             const std::size_t send = writeBuffer(buffer);
             totalSend += send;
@@ -80,7 +80,7 @@ public:
                 _recvEvent.set();
             }
             if (_needSend -= send; _needSend > 0) {
-                co_await _sendEvent.wait();
+                co_await _sendEvent.wait(_executor);
             }
         }
         co_return totalSend;
