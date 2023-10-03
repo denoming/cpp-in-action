@@ -4,6 +4,7 @@
 
 #include <boost/asio/experimental/channel.hpp>
 #include <boost/asio/experimental/concurrent_channel.hpp>
+#include <boost/asio/experimental/awaitable_operators.hpp>
 
 namespace io = boost::asio;
 namespace ioe = boost::asio::experimental;

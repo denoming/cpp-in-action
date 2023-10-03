@@ -4,22 +4,82 @@
 
 class Event {
 public:
-    enum State { NotSet, Waiting, Set };
+    enum class State { NotSet, Waiting, Set, Cancelled };
 
-    io::awaitable<void>
-    wait(io::any_io_executor executor);
+    template<io::completion_token_for<void(sys::error_code)> CompletionToken>
+    auto
+    wait(CompletionToken&& token)
+    {
+        auto initiate
+            = [this](io::completion_handler_for<void(sys::error_code)> auto&& handler) mutable {
+                  if (auto slot = io::get_associated_cancellation_slot(handler);
+                      slot.is_connected()) {
+                      slot.assign([this](auto) { cancel(); });
+                  }
 
-    bool
-    pending();
+                  _handler = [executor = io::get_associated_executor(handler),
+                              handler = std::forward<decltype(handler)>(handler)](auto ec) mutable {
+                      io::post(executor,
+                               [handler = std::move(handler), ec]() mutable { handler(ec); });
+                  };
+
+                  State oldState = State::NotSet;
+                  if (not _state.compare_exchange_strong(oldState,
+                                                         State::Waiting,
+                                                         std::memory_order_release,
+                                                         std::memory_order_acquire)) {
+                      _handler((oldState == State::Cancelled)
+                                   ? sys::error_code{io::error::operation_aborted}
+                                   : sys::error_code{});
+                  }
+              };
+
+        return io::async_initiate<CompletionToken, void(sys::error_code)>(initiate, token);
+    }
+
+    [[nodiscard]] State
+    state() const
+    {
+        return _state;
+    }
 
     void
-    set();
+    set()
+    {
+        State oldState = State::NotSet;
+        if (not _state.compare_exchange_strong(
+                oldState, State::Set, std::memory_order_release, std::memory_order_acquire)) {
+            /* wait(...) call was first */
+            if (oldState == State::Waiting
+                and _state.compare_exchange_strong(
+                    oldState,
+                    State::Set,
+                    std::memory_order_relaxed,
+                    std::memory_order_relaxed) /* Try to set again */) {
+                _handler(sys::error_code{});
+            }
+        }
+    }
 
     void
-    reset();
+    cancel()
+    {
+        State oldState = State::NotSet;
+        if (not _state.compare_exchange_strong(
+                oldState, State::Cancelled, std::memory_order_release, std::memory_order_acquire)) {
+            /* wait(...) call was first */
+            if (oldState == State::Waiting
+                and _state.compare_exchange_strong(
+                    oldState,
+                    State::Cancelled,
+                    std::memory_order_release,
+                    std::memory_order_acquire) /* Try to set again */) {
+                _handler(sys::error_code{io::error::operation_aborted});
+            }
+        }
+    }
 
 private:
-    io::any_io_executor _executor;
     std::atomic<State> _state{State::NotSet};
-    std::move_only_function<void()> _handler;
+    std::move_only_function<void(sys::error_code)> _handler;
 };
