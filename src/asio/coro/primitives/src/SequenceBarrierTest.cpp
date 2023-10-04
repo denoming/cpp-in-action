@@ -12,9 +12,9 @@ TEST(SequenceBarrierTest, WaitPublish)
     SequenceBarrier barrier;
 
     auto consumer = [&]() -> io::awaitable<void> {
-        auto lastSeq = co_await barrier.waitUntil(7u);
+        auto lastSeq = co_await barrier.wait(7u);
         EXPECT_THAT(lastSeq, Eq(7));
-        lastSeq = co_await barrier.waitUntil(11u);
+        lastSeq = co_await barrier.wait(11u);
         EXPECT_THAT(lastSeq, Gt(7));
     };
 

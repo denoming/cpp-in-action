@@ -58,7 +58,7 @@ public:
 #endif
 
     io::awaitable<TSequence>
-    waitUntil(TSequence targetSeq)
+    wait(TSequence targetSeq)
     {
         TSequence lastSeq = _lastPublished;
         if (not Traits::precedes(lastSeq, targetSeq)) {
