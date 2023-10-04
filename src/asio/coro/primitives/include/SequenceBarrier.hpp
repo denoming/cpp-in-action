@@ -18,7 +18,7 @@ public:
     {
     }
 
-    io::awaitable<TSequence>
+    [[nodiscard]] io::awaitable<TSequence>
     wait()
     {
         co_await _event.wait(io::use_awaitable);
@@ -57,7 +57,13 @@ public:
     }
 #endif
 
-    io::awaitable<TSequence>
+    [[nodiscard]] TSequence
+    lastPublished() const
+    {
+        return _lastPublished;
+    }
+
+    [[nodiscard]] io::awaitable<TSequence>
     wait(TSequence targetSeq)
     {
         TSequence lastSeq = _lastPublished;
