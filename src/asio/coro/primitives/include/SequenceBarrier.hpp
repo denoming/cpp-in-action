@@ -66,7 +66,7 @@ public:
     [[nodiscard]] io::awaitable<TSequence>
     wait(TSequence targetSeq)
     {
-        TSequence lastSeq = _lastPublished;
+        TSequence lastSeq = lastPublished();
         if (not Traits::precedes(lastSeq, targetSeq)) {
             co_return lastSeq;
         }
