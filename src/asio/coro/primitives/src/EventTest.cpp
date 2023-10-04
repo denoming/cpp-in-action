@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Event.hpp"
+#include "Utils.hpp"
 
 #include <boost/asio/experimental/awaitable_operators.hpp>
 
@@ -8,19 +9,6 @@
 
 using namespace testing;
 using namespace std::literals;
-
-namespace {
-
-template<typename Rep, typename Period>
-io::awaitable<void>
-asyncSleep(std::chrono::duration<Rep, Period> duration)
-{
-    auto timer = io::system_timer(co_await io::this_coro::executor);
-    timer.expires_after(duration);
-    co_await timer.async_wait(io::use_awaitable);
-}
-
-} // namespace
 
 class EventTest : public TestWithParam<std::size_t> {
 public:

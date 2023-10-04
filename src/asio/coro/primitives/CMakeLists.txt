@@ -5,6 +5,7 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
     PRIVATE
         src/EventTest.cpp
+        src/SequenceBarrierTest.cpp
 )
 
 target_include_directories(${TARGET}
