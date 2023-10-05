@@ -10,12 +10,18 @@ target_sources(${TARGET}
 )
 
 target_include_directories(${TARGET}
-        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
+
+if (DEBUG)
+    target_compile_definitions(${TARGET}
+        PRIVATE -DDEBUG
+    )
+endif()
 
 target_link_libraries(${TARGET}
     PRIVATE Boost::headers
-            fmt::fmt
+            spdlog::spdlog
             GTest::gtest_main
             GTest::gmock_main
             ThreadSanitizer

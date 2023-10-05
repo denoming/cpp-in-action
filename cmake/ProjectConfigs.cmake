@@ -23,5 +23,6 @@ endif()
 include(AddBoost)
 include(AddFmt)
 include(AddLibEvent)
+include(AddSpdLog)
 
 include(EnableSanitizers)
