@@ -7,6 +7,7 @@
 #include "Scheduler.hpp"
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_sinks.h>
 
 using namespace testing;
 

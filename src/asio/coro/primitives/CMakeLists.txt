@@ -7,6 +7,7 @@ target_sources(${TARGET}
         src/EventTest.cpp
         src/SequenceTraitsTest.cpp
         src/SequenceBarrierTest.cpp
+        src/SingleProducerSequencerTest.cpp
 )
 
 target_include_directories(${TARGET}
