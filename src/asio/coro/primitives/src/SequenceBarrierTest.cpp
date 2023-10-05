@@ -7,7 +7,6 @@
 #include "Scheduler.hpp"
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
 
 using namespace testing;
 
@@ -17,8 +16,10 @@ public:
     static void
     SetUpTestSuite()
     {
-        spdlog::set_pattern("[%E] %v");
-        spdlog::set_level(spdlog::level::debug);
+        auto logger = spdlog::stderr_logger_mt("stderr");
+        logger->set_pattern("[%E] %v");
+        logger->set_level(spdlog::level::debug);
+        spdlog::set_default_logger(logger);
     }
 #endif
 };
@@ -191,32 +192,32 @@ TEST_F(SequenceBarrierTest, MultipleThreads)
 
     auto producer = [&]() -> io::awaitable<void> {
         std::size_t available = (barrier2.lastPublished() + kBufferSize);
-        for (std::size_t cursor = 0; cursor <= kIterations; ++cursor) {
-            if (SequenceTraits<std::size_t>::precedes(available, cursor)) {
+        for (std::size_t n = 0; n <= kIterations; ++n) {
+            if (SequenceTraits<std::size_t>::precedes(available, n)) {
                 spdlog::debug("send: cursor<{}>, available<{}>");
-                available = co_await barrier2.wait(cursor - kBufferSize) + kBufferSize;
+                available = co_await barrier2.wait(n - kBufferSize) + kBufferSize;
             }
 
-            if (cursor == kIterations) {
-                values[cursor % kBufferSize] = kStopValue;
+            if (n == kIterations) {
+                values[n % kBufferSize] = kStopValue;
             } else {
-                spdlog::debug("send: write<{}>", cursor % kBufferSize);
-                values[cursor % kBufferSize] = int32_t(cursor) + 1;
+                spdlog::debug("send: write<{}>", n % kBufferSize);
+                values[n % kBufferSize] = int32_t(n) + 1;
             }
 
-            barrier1.publish(cursor);
+            barrier1.publish(n);
         }
     };
 
     auto consumer = [&]() -> io::awaitable<void> {
-        std::size_t cursor{0};
+        std::size_t k{0};
         while (true) {
-            const std::size_t available = co_await barrier1.wait(cursor);
+            const std::size_t available = co_await barrier1.wait(k);
 
             spdlog::debug("recv: available<{}>", available);
             do {
                 spdlog::debug("recv: process<{}>", available);
-                if (const int32_t value = values[cursor % kBufferSize]; value == kStopValue) {
+                if (const int32_t value = values[k % kBufferSize]; value == kStopValue) {
                     spdlog::debug("recv: exit");
                     co_return;
                 } else {
@@ -224,7 +225,7 @@ TEST_F(SequenceBarrierTest, MultipleThreads)
                     result += value;
                 }
             }
-            while (cursor++ != available);
+            while (k++ != available);
             spdlog::debug("recv: publish<{}>");
             barrier2.publish(available);
         }
