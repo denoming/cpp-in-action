@@ -28,7 +28,9 @@ SingleProducerSequencer -> SBP : wait(seq: int = 0)
 deactivate SingleProducerSequencer
 ...
 Producer -> SingleProducerSequencer : claimOne()
+activate Producer
 SingleProducerSequencer -> SBC : wait(seq: int = (0 - 16) = 240u)
+activate SingleProducerSequencer
 SingleProducerSequencer <-- SBC : wait(seq: int = 255 (lastPublished = initialValue))
 note right: returns immediately
 SingleProducerSequencer -> SingleProducerSequencer : claimPos++
@@ -36,6 +38,7 @@ note right: move claim position
 Producer <-- SingleProducerSequencer : claimOne()
 Producer -> Producer : write(index = 0)
 Producer -> SingleProducerSequencer : publish(seq: int = 0)
+deactivate Producer
 SingleProducerSequencer -> SBP : publish(seq: int = 0)
 SingleProducerSequencer <-- SBP : [resume] wait(seq: int = 0)
 Consumer <-- SingleProducerSequencer : [resume] wait(seq: int = 0)
@@ -48,6 +51,7 @@ Producer -> SingleProducerSequencer : claimOne()
 SingleProducerSequencer -> SBC : wait(seq: int = (1 - 16) = 241u)
 SingleProducerSequencer <-- SBC : wait(seq: int = 0)
 note right: returns immediately  and repeat above sequence
+deactivate SingleProducerSequencer
 
 @enduml
 ```

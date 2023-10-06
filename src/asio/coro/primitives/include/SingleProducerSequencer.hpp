@@ -20,9 +20,21 @@ public:
     {
     }
 
+    void
+    close()
+    {
+        _producerBarrier.close();
+        _consumerBarrier.close();
+    }
+
     [[nodiscard]] io::awaitable<TSequence>
     claimOne()
     {
+        io::cancellation_state cs = co_await io::this_coro::cancellation_state;
+        if (auto slot = cs.slot(); slot.is_connected() and not slot.has_handler()) {
+            slot.assign([this](auto) { close(); });
+        }
+
         const std::unsigned_integral auto writePos = TSequence(_claimPos - _bufferSize);
         TSequence lastPublished = co_await _consumerBarrier.wait(writePos);
         co_return _claimPos++;
@@ -31,6 +43,11 @@ public:
     io::awaitable<Range>
     claimUpTo(std::size_t count)
     {
+        io::cancellation_state cs = co_await io::this_coro::cancellation_state;
+        if (auto slot = cs.slot(); slot.is_connected() and not slot.has_handler()) {
+            slot.assign([this](auto) { close(); });
+        }
+
         const std::unsigned_integral auto writePos = TSequence(_claimPos - _bufferSize);
         const TSequence maxSeq = TSequence(co_await _consumerBarrier.wait(writePos) + _bufferSize);
 
@@ -64,6 +81,11 @@ public:
     [[nodiscard]] io::awaitable<TSequence>
     wait(TSequence seq)
     {
+        io::cancellation_state cs = co_await io::this_coro::cancellation_state;
+        if (auto slot = cs.slot(); slot.is_connected() and not slot.has_handler()) {
+            slot.assign([this](auto) { close(); });
+        }
+
         co_return co_await _producerBarrier.wait(seq);
     }
 

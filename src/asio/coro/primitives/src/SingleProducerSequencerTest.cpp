@@ -12,6 +12,15 @@
 
 using namespace testing;
 
+using Barrier = SequenceBarrier<uint16_t>;
+using Sequencer = SingleProducerSequencer<uint16_t>;
+
+static const size_t kDefaultBufferSize{256};
+static const size_t kMask{kDefaultBufferSize - 1};
+static const size_t kIterations{kDefaultBufferSize * 3};
+static const int32_t kStopValue = std::numeric_limits<int32_t>::max();
+static const int32_t kNoneValue = -1;
+
 class SingleProducerSequencerTest : public Test {
 public:
 #ifdef DEBUG
@@ -28,19 +37,10 @@ public:
 
 TEST_F(SingleProducerSequencerTest, ClaimOne)
 {
-    using Barrier = SequenceBarrier<uint16_t>;
-    using Sequencer = SingleProducerSequencer<uint16_t>;
-
-    static const size_t kBufferSize{256};
-    static const size_t kMask{kBufferSize - 1};
-    static const size_t kIterations{kBufferSize * 3};
-    static const int32_t kStopValue = std::numeric_limits<int32_t>::max();
-    static const int32_t kNoneValue = -1;
-
     std::int64_t result{};
     std::int64_t expectedResult = kIterations * (kIterations + 1) / 2;
 
-    std::array<int32_t, kBufferSize> values = {};
+    std::array<int32_t, kDefaultBufferSize> values = {};
     std::fill(std::begin(values), std::end(values), kNoneValue);
 
     auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
@@ -66,7 +66,7 @@ TEST_F(SingleProducerSequencerTest, ClaimOne)
             const size_t available = co_await sequencer.wait(k);
             do {
                 spdlog::debug("recv: read<{}>", k & kMask);
-                if (const int32_t value = values[k % kBufferSize]; value == kStopValue) {
+                if (const int32_t value = values[k % kDefaultBufferSize]; value == kStopValue) {
                     spdlog::debug("recv: exit");
                     co_return;
                 } else {
@@ -79,7 +79,7 @@ TEST_F(SingleProducerSequencerTest, ClaimOne)
     };
 
     Barrier barrier;
-    Sequencer sequencer{barrier, kBufferSize};
+    Sequencer sequencer{barrier, kDefaultBufferSize};
 
     io::thread_pool pool{2};
     io::any_io_executor executorA = pool.get_executor();
@@ -93,20 +93,12 @@ TEST_F(SingleProducerSequencerTest, ClaimOne)
 
 TEST_F(SingleProducerSequencerTest, ClaimUpTo)
 {
-    using Barrier = SequenceBarrier<uint16_t>;
-    using Sequencer = SingleProducerSequencer<uint16_t>;
-
-    static const size_t kBufferSize{256};
     static const size_t kBatchSize{16};
-    static const size_t kMask{kBufferSize - 1};
-    static const size_t kIterations{kBufferSize * 3};
-    static const int32_t kStopValue = std::numeric_limits<int32_t>::max();
-    static const int32_t kNoneValue = -1;
 
     std::int64_t result{};
     std::int64_t expectedResult = kIterations * (kIterations + 1) / 2;
 
-    std::array<int32_t, kBufferSize> values = {};
+    std::array<int32_t, kDefaultBufferSize> values = {};
     std::fill(std::begin(values), std::end(values), kNoneValue);
 
     auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
@@ -133,7 +125,7 @@ TEST_F(SingleProducerSequencerTest, ClaimUpTo)
             const size_t available = co_await sequencer.wait(k);
             do {
                 spdlog::debug("recv: read<{}>", k & kMask);
-                if (const int32_t value = values[k % kBufferSize]; value == kStopValue) {
+                if (const int32_t value = values[k % kDefaultBufferSize]; value == kStopValue) {
                     spdlog::debug("recv: exit");
                     co_return;
                 } else {
@@ -146,7 +138,7 @@ TEST_F(SingleProducerSequencerTest, ClaimUpTo)
     };
 
     Barrier barrier;
-    Sequencer sequencer{barrier, kBufferSize};
+    Sequencer sequencer{barrier, kDefaultBufferSize};
 
     io::thread_pool pool{2};
     io::any_io_executor executorA = pool.get_executor();
@@ -157,3 +149,118 @@ TEST_F(SingleProducerSequencerTest, ClaimUpTo)
 
     EXPECT_EQ(result, expectedResult);
 }
+
+TEST_F(SingleProducerSequencerTest, CloseWhenClaimOne)
+{
+    auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
+        // Claim all slots first
+        co_await sequencer.claimUpTo(kDefaultBufferSize);
+        try {
+            co_await sequencer.claimOne();
+        } catch (const sys::system_error& e) {
+            EXPECT_EQ(e.code(), io::error::operation_aborted);
+        }
+    };
+
+    auto consumer = [&](Sequencer& sequencer, Barrier& barrier) -> io::awaitable<void> {
+        try {
+            co_await sequencer.wait(0);
+        } catch (const sys::system_error& e) {
+            EXPECT_EQ(e.code(), io::error::operation_aborted);
+        }
+    };
+
+    Barrier barrier;
+    Sequencer sequencer{barrier, kDefaultBufferSize};
+
+    io::io_context context;
+    co_spawn(context, consumer(sequencer, barrier), io::detached);
+    co_spawn(context, producer(sequencer), io::detached);
+    co_spawn(
+        context,
+        [&]() -> io::awaitable<void> {
+            sequencer.close();
+            co_return;
+        },
+        io::detached);
+    context.run();
+}
+
+TEST_F(SingleProducerSequencerTest, CancelClaimOne)
+{
+    auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
+        // Claim all slots first
+        co_await sequencer.claimUpTo(kDefaultBufferSize);
+        try {
+            using namespace ioe::awaitable_operators;
+            auto rv = co_await (sequencer.claimOne() or asyncSleep(std::chrono::milliseconds(10)));
+            EXPECT_EQ(rv.index(), 1 /* sleep end first */);
+        } catch (const sys::system_error& e) {
+            EXPECT_TRUE(false) << "Should be called";
+        }
+    };
+
+    Barrier barrier;
+    Sequencer sequencer{barrier, kDefaultBufferSize};
+
+    io::io_context context;
+    co_spawn(context, producer(sequencer), io::detached);
+    context.run();
+}
+
+TEST_F(SingleProducerSequencerTest, CancelClaimUpTo)
+{
+    auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
+        // Claim all slots first
+        co_await sequencer.claimUpTo(kDefaultBufferSize);
+        try {
+            using namespace ioe::awaitable_operators;
+            auto rv = co_await (sequencer.claimUpTo(kDefaultBufferSize)
+                                or asyncSleep(std::chrono::milliseconds(10)));
+            EXPECT_EQ(rv.index(), 1 /* sleep end first */);
+        } catch (const sys::system_error& e) {
+            EXPECT_TRUE(false) << "Should be called";
+        }
+    };
+
+    Barrier barrier;
+    Sequencer sequencer{barrier, kDefaultBufferSize};
+
+    io::io_context context;
+    co_spawn(context, producer(sequencer), io::detached);
+    context.run();
+}
+
+TEST_F(SingleProducerSequencerTest, CancelWait)
+{
+    auto producer = [&](Sequencer& sequencer) -> io::awaitable<void> {
+        // Claim all slots first
+        co_await sequencer.claimUpTo(kDefaultBufferSize);
+        try {
+            co_await sequencer.claimOne();
+        } catch (const sys::system_error& e) {
+            EXPECT_EQ(e.code(), io::error::operation_aborted);
+        }
+    };
+
+    auto consumer = [&](Sequencer& sequencer) -> io::awaitable<void> {
+        try {
+            using namespace ioe::awaitable_operators;
+            auto rv = co_await (sequencer.wait(0) or asyncSleep(std::chrono::milliseconds(10)));
+            EXPECT_EQ(rv.index(), 1 /* sleep end first */);
+        } catch (const sys::system_error& e) {
+            EXPECT_TRUE(false) << "Should be called";
+        }
+    };
+
+    Barrier barrier;
+    Sequencer sequencer{barrier, kDefaultBufferSize};
+
+    io::io_context context;
+    co_spawn(context, producer(sequencer), io::detached);
+    co_spawn(context, consumer(sequencer), io::detached);
+    context.run();
+}
+
+
+
