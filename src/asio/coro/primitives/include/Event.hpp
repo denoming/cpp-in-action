@@ -13,7 +13,7 @@ public:
         auto initiate
             = [this](io::completion_handler_for<void(sys::error_code)> auto&& handler) mutable {
                   if (auto slot = io::get_associated_cancellation_slot(handler);
-                      slot.is_connected()) {
+                      slot.is_connected() and not slot.has_handler()) {
                       slot.assign([this](auto) { cancel(); });
                   }
 
