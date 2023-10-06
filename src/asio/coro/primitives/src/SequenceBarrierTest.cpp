@@ -241,3 +241,31 @@ TEST_F(SequenceBarrierTest, MultipleThreads)
 
     EXPECT_EQ(result, expectedResult);
 }
+
+TEST_F(SequenceBarrierTest, Close)
+{
+    SequenceBarrier<size_t> barrier;
+
+    size_t exceptions{};
+    auto consumer = [&](size_t seq) -> io::awaitable<void> {
+        try {
+            co_await barrier.wait(seq);
+        } catch (const sys::system_error& e) {
+            exceptions++;
+            EXPECT_EQ(e.code(), io::error::operation_aborted);
+        }
+    };
+
+    io::io_context context;
+    io::co_spawn(context, consumer(10), io::detached);
+    io::co_spawn(context, consumer(15), io::detached);
+    io::co_spawn(
+        context,
+        [&]() -> io::awaitable<void> {
+            barrier.close();
+            co_return;
+        },
+        io::detached);
+    context.run();
+    EXPECT_EQ(exceptions, 2);
+}

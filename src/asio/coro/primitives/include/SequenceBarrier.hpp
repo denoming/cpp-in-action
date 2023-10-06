@@ -33,6 +33,12 @@ public:
         _event.set();
     }
 
+    void
+    cancel()
+    {
+        _event.cancel();
+    }
+
 private:
     Event _event;
 };
@@ -45,7 +51,8 @@ template<std::unsigned_integral TSequence = std::size_t,
 class SequenceBarrier {
 public:
     explicit SequenceBarrier(TSequence initialSeq = Traits::initialSequence)
-        : _lastPublished{initialSeq}
+        : _closed{false}
+        , _lastPublished{initialSeq}
         , _awaiters{nullptr}
     {
     }
@@ -63,12 +70,29 @@ public:
         return _lastPublished;
     }
 
+    void
+    close()
+    {
+        _closed = true;
+
+        TAwaiter* awaiters = _awaiters.exchange(nullptr);
+        while (awaiters) {
+            awaiters->cancel();
+            awaiters = awaiters->next;
+        }
+    }
+
     [[nodiscard]] io::awaitable<TSequence>
     wait(TSequence targetSeq)
     {
         TSequence lastSeq = lastPublished();
         if (not Traits::precedes(lastSeq, targetSeq)) {
             co_return lastSeq;
+        }
+
+        io::cancellation_state cs = co_await io::this_coro::cancellation_state;
+        if (auto slot = cs.slot(); slot.is_connected() and not slot.has_handler()) {
+            slot.assign([this](auto) { close(); });
         }
 
         TAwaiter awaiter{targetSeq};
@@ -144,7 +168,7 @@ private:
 
             // Check if the sequence we were waiting for wasn't published yet
             prevSeq = _lastPublished;
-            if (Traits::precedes(prevSeq, nextSeq)) {
+            if (Traits::precedes(prevSeq, nextSeq) and not _closed) {
                 // None of the awaiters we enqueued have been satisfied yet
                 break;
             }
@@ -173,7 +197,7 @@ private:
             // Calculate the earliest target sequence required by any of the awaiters to requeue.
             nextSeq = static_cast<TSequence>(prevSeq + minDiff);
         }
-        while (toRequeue);
+        while (toRequeue and not _closed);
 
         // Null-terminate the list of awaiters to resume
         *toResumeTail = nullptr;
@@ -187,6 +211,7 @@ private:
     }
 
 private:
+    std::atomic<bool> _closed;
     std::atomic<TSequence> _lastPublished;
-    mutable std::atomic<TAwaiter*> _awaiters;
+    std::atomic<TAwaiter*> _awaiters;
 };
