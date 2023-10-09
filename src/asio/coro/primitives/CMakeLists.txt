@@ -5,6 +5,8 @@ add_executable(${TARGET} "")
 target_sources(${TARGET}
     PRIVATE
         src/EventTest.cpp
+        src/BoundedChannelTest.cpp
+        src/ConditionTest.cpp
         src/SequenceTraitsTest.cpp
         src/SequenceBarrierTest.cpp
         src/SingleProducerSequencerTest.cpp
