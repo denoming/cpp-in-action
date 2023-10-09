@@ -79,6 +79,13 @@ public:
         }
     }
 
+    void
+    reset()
+    {
+        _state = State::NotSet;
+        _handler = {};
+    }
+
 private:
     std::atomic<State> _state{State::NotSet};
     std::move_only_function<void(sys::error_code)> _handler;
