@@ -1,19 +1,19 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-#include "Scheduler.hpp"
 #include "Utils.hpp"
 #include "SingleProducerSequencer.hpp"
 
 #include <spdlog/spdlog.h>
+#ifdef DEBUG
 #include <spdlog/sinks/stdout_sinks.h>
+#endif
 
 #include <array>
 
 using namespace testing;
 
-using Barrier = SequenceBarrier<uint16_t>;
-using Sequencer = SingleProducerSequencer<uint16_t>;
+using Barrier = SequenceBarrier<size_t>;
+using Sequencer = SingleProducerSequencer<size_t>;
 
 static const size_t kDefaultBufferSize{256};
 static const size_t kMask{kDefaultBufferSize - 1};
@@ -64,6 +64,7 @@ TEST_F(SingleProducerSequencerTest, ClaimOne)
         size_t k{0};
         while (true) {
             const size_t available = co_await sequencer.wait(k);
+            spdlog::debug("recv: available<{}>", available - k + 1);
             do {
                 spdlog::debug("recv: read<{}>", k & kMask);
                 if (const int32_t value = values[k % kDefaultBufferSize]; value == kStopValue) {
@@ -123,6 +124,7 @@ TEST_F(SingleProducerSequencerTest, ClaimUpTo)
         size_t k{0};
         while (true) {
             const size_t available = co_await sequencer.wait(k);
+            spdlog::debug("recv: available<{}>", available - k + 1);
             do {
                 spdlog::debug("recv: read<{}>", k & kMask);
                 if (const int32_t value = values[k % kDefaultBufferSize]; value == kStopValue) {
@@ -261,6 +263,3 @@ TEST_F(SingleProducerSequencerTest, CancelWait)
     co_spawn(context, consumer(sequencer), io::detached);
     context.run();
 }
-
-
-
