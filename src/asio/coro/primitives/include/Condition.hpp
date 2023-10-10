@@ -25,8 +25,8 @@ public:
             auto [status, _] = co_await _channel.async_receive(io::as_tuple(io::use_awaitable));
             if (status) {
                 const int code = status.value();
-                if (code == ioe::error::channel_cancelled or code == ioe::error::channel_closed) {
-                    /* Channel is closed while waiting */
+                if (status.category() == ioe::error::get_channel_category()) {
+                    /* Channel is closed or cancelled while waiting */
                     status.assign(io::error::operation_aborted, sys::system_category());
                 }
                 co_return status;
