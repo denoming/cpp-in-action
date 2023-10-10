@@ -2,6 +2,7 @@
 
 #include "Condition.hpp"
 #include "Scheduler.hpp"
+#include "Utils.hpp"
 
 using namespace testing;
 
@@ -34,17 +35,15 @@ TEST(ConditionTest, Checking)
     EXPECT_EQ(v2, 1);
 }
 
-TEST(ConditionTest, Cancel)
+TEST(ConditionTest, ManualCancelling)
 {
-    int32_t v1{-1};
-
     auto producer = [&](Condition& condition) -> io::awaitable<void> {
         co_await scheduler(co_await io::this_coro::executor);
         condition.close();
     };
 
     auto consumer = [&](Condition& condition) -> io::awaitable<void> {
-        const auto ec = co_await condition.wait([&]() { return (v1 > 0); });
+        const auto ec = co_await condition.wait([&]() { return false; });
         EXPECT_EQ(ec.value(), io::error::operation_aborted);
     };
 
@@ -52,5 +51,21 @@ TEST(ConditionTest, Cancel)
     Condition condition{context.get_executor()};
     io::co_spawn(context, producer(condition), io::detached);
     io::co_spawn(context, consumer(condition), io::detached);
+    context.run();
+}
+
+TEST(ConditionTest, AutoCancelling)
+{
+    io::io_context context;
+    Condition condition{context.get_executor()};
+    io::co_spawn(
+        context,
+        [&]() -> io::awaitable<void> {
+            using namespace ioe::awaitable_operators;
+            auto result = co_await (condition.wait([&]() { return false; })
+                                    or asyncSleep(std::chrono::milliseconds{20}));
+            EXPECT_EQ(result.index(), 1);
+        },
+        io::detached);
     context.run();
 }

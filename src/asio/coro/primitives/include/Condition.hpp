@@ -21,6 +21,11 @@ public:
             co_return sys::error_code{io::error::operation_aborted, sys::system_category()};
         }
 
+        const auto cs = co_await io::this_coro::cancellation_state;
+        if (auto slot = cs.slot(); slot.is_connected() and not slot.has_handler()) {
+            slot.assign([this](auto) { close(); });
+        }
+
         while (not predicate()) {
             auto [status, _] = co_await _channel.async_receive(io::as_tuple(io::use_awaitable));
             if (status) {
