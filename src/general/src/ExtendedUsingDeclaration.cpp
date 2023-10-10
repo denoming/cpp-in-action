@@ -77,8 +77,9 @@ enum class Color { red, green, blue };
 std::string_view
 toString(Color color)
 {
-    using enum Color;
     switch (color) {
+        // Use 'using enum' inside the switch explicitly
+        using enum Color;
     case red:
         return "red";
     case green:
