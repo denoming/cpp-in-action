@@ -8,9 +8,9 @@ Component Configurator further supports the reconfiguration of components into d
 application processes without having to shut down and re-start running processes.
 
 Pros:
- * Uniformity (one configuration and control interface)
+ * Uniformity (one configuration by script file and control interface)
  * Centralized administration
- * Modularity, testability, and reusability
+ * Modularity, testability, and re-usability
  * Configuration dynamism and control (supporting of dynamically reconfiguration)
  * Tuning and optimization
 
@@ -39,16 +39,16 @@ interface Component {
 }
 
 class ComponentRepository {
-    +insert(string name, Component* object)
-    +find(string name): Component*
-    +remove(string name)
-    +suspend(string name)
-    +resume(string name)
+    +insert(name: string, object: Component*)
+    +find(name: string): Component*
+    +remove(name: string)
+    +suspend(name: string)
+    +resume(name: string)
 }
 
 class ComponentConfigurator {
-    +process(path scriptPath)
-    +process(string directive)
+    +process(scriptPath: string)
+    +process(directive: string)
     +repository(): ComponentRepository*
 }
 
@@ -84,11 +84,17 @@ SUSPENDED --> [*] : fini()
 # Dynamics
 
 * __Component initialization__
-  The component configurator dynamically links a component into an application and initializes it.3 After a component has been initialized successfully the component configurator adds it to its component repository. This repository manages all configured components at run-time.
+  The component configurator dynamically links a component into an application and initializes it. 
+  After a component has been initialized successfully the component configurator adds it to its component repository.
+  This repository manages all configured components at run-time.
 * __Component processing__
-  After being configured into an application, a component performs its processing tasks, such as exchanging messages with peer components and performing service requests. The component configurator can suspend and resume existing components temporarily, for example when (re)configuring other components.
+  After being configured into an application, a component performs its processing tasks, such as exchanging messages
+  with peer components and performing service requests. The component configurator can suspend and resume existing
+  components temporarily, for example when (re)configuring other components.
 * __Component termination__
-  The component configurator shuts down components after they are no longer needed, allowing them the opportunity to clean up their resources before terminating. When terminating a component, the component configurator removes it from the component repository and unlinks it from the application’s address space.
+  The component configurator shuts down components after they are no longer needed, allowing them the opportunity
+  to clean up their resources before terminating. When terminating a component, the component configurator removes it
+  from the component repository and unlinks it from the application’s address space.
 
 Example of configuration script:
 ```text
@@ -97,9 +103,9 @@ dynamic TimeServer Component *
    cristian.dll:makeTimeServer()
       "-p $TIME_SERVER_PORT"
 ```
-* Dynamically link the mentioned DLL
-* Invoke `makeTimeServer()` factory method to allocate object of type TimeServer
-* Pass `-p $TIME_SERVER_PORT` to newlly allocated object as `argc/argv` arguments
+* Dynamically link `cristian.dll` shared library;
+* Invoke `makeTimeServer()` factory method to allocate object of type TimeServer in address space;
+* Pass `-p $TIME_SERVER_PORT` to newly created component as `argc/argv` arguments.
 
 # Reference
 
