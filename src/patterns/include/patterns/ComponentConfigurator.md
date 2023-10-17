@@ -107,6 +107,26 @@ dynamic TimeServer Component *
 * Invoke `makeTimeServer()` factory method to allocate object of type TimeServer in address space;
 * Pass `-p $TIME_SERVER_PORT` to newly created component as `argc/argv` arguments.
 
+```plantuml
+@startuml
+
+participant ComponentConfigurator
+participant ConcreteComponentA
+participant ConcreteComponentB
+participant ComponentRepository
+
+ComponentConfigurator -> ConcreteComponentA : init()
+ComponentConfigurator -> ComponentRepository : insert()
+ComponentConfigurator -> ConcreteComponentB : init()
+ComponentConfigurator -> ComponentRepository : insert()
+...
+ComponentConfigurator -> ConcreteComponentA : fini()
+ComponentConfigurator -> ComponentRepository : remove()
+ComponentConfigurator -> ConcreteComponentB : fini()
+ComponentConfigurator -> ComponentRepository : remove()
+@enduml
+```
+
 # Reference
 
 * "Pattern-Oriented Software Architecture, Volume 2, Chapter 2" By Douglas C. Schmidt, Michael Stal, Hans Rohnert, Frank Buschmann
