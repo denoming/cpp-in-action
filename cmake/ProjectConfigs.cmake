@@ -11,18 +11,13 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(MCPP_ENABLE_TESTS)
-    include(AddGoogleTest)
-endif()
+include(EnableSanitizers)
 
-if(MCPP_ENABLE_PARALLEL)
-    find_package(Threads REQUIRED)
-    find_package(TBB REQUIRED)
+if(ENABLE_PARALLEL)
+    include(AddTbb)
 endif()
-
+include(AddGoogleTest)
 include(AddBoost)
 include(AddFmt)
 include(AddLibEvent)
 include(AddSpdLog)
-
-include(EnableSanitizers)

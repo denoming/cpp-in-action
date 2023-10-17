@@ -19,8 +19,5 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET}
-    PUBLIC
-        Threads::Threads
-        TBB::tbb
     PRIVATE Boost::headers
 )

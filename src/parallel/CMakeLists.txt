@@ -22,8 +22,10 @@ PRIVATE
 target_link_libraries(${TARGET}
 PRIVATE
     ${PROJECT_NAME}::common
+    Threads::Threads
     GTest::gtest_main
     GTest::gmock_main
+    TBB::tbb
 )
 
 if (NOT CMAKE_CROSSCOMPILING)
