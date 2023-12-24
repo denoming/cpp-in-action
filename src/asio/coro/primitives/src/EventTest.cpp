@@ -42,7 +42,15 @@ TEST_P(EventTest, Test)
             co_return;
         };
 
-        io::co_spawn((n % 2) ? executor1 : executor2, consumer(), io::detached);
+        io::co_spawn((n % 2) ? executor1 : executor2, consumer(), [](std::exception_ptr ptr){
+            try {
+              if (ptr) {
+                  std::rethrow_exception(ptr);
+              }
+            } catch (...) {
+                int a = 10;
+            }
+        });
         io::co_spawn((n % 2) ? executor2 : executor1, producer(), io::detached);
 
         while (not flag1 or not flag2) {
