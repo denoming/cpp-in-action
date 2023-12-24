@@ -46,6 +46,8 @@ private:
 /** ========================================== */
 /** Override global memory allocation function */
 
+#ifndef DEFAULT_ALLOCATION
+
 [[nodiscard]] extern void*
 operator new(std::size_t size);
 
@@ -58,8 +60,12 @@ operator new(std::size_t size, std::align_val_t align);
 [[nodiscard]] extern void*
 operator new[](std::size_t size, std::align_val_t align);
 
+#endif
+
 /** ============================================ */
 /** Override global memory de-allocation function */
+
+#ifndef DEFAULT_ALLOCATION
 
 extern void
 operator delete(void* p) noexcept;
@@ -84,5 +90,7 @@ operator delete(void* p, std::size_t, std::align_val_t align) noexcept;
 
 extern void
 operator delete[](void* p, std::size_t, std::align_val_t align) noexcept;
+
+#endif
 
 #pragma clang diagnostic pop

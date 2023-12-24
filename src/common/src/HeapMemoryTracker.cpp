@@ -81,10 +81,45 @@ HeapMemoryTracker::allocSize()
     return _allocSize;
 }
 
+#ifndef DEFAULT_ALLOCATION
+
+/**
+ * void* operator new(std::size_t)                    T* p = new T
+ * void* operator new(std::size_t, std::nothrow)      T* p = new(std::nothrow) T
+ * void* operator new(std::size_t, void* address)     T* p = new(address) T
+ * void* operator new(std::size_t count, args...)     T* p = new(args...) T
+ *
+ * void* operator new[](std::size_t)                  T* p = new[n] T
+ * void* operator new[](std::size_t, std::nothrow)    T* p = new(std::nothrow) T[n]
+ * void* operator new[](std::size_t, void* address)   T* p = new(address) T[n]
+ * void* operator new[](std::size_t count, args...)   T* p = new(args...) T[n]
+ *
+ * void operator delete(void*)                        delete p;
+ * void operator delete(void*, std::nothrow)          <special cases>
+ * void operator delete(void*, void*)                 <special cases>
+ * void operator delete(void*, args...)               <special cases>
+ * void operator delete[](void*)                      delete[] p;
+ * void operator delete[](void*, std::nothrow)        <special cases>
+ * void operator delete[](void*, void*)               <special cases>
+ * void operator delete[](void*, args)                <special cases>
+ */
+
 [[nodiscard]] void*
 operator new(std::size_t size)
 {
     return HeapMemoryTracker::allocate(size, 0, "::new");
+}
+
+[[nodiscard]] void*
+operator new(std::size_t size, const std::nothrow_t&) noexcept
+{
+    return HeapMemoryTracker::allocate(size, 0, "::new(nothrow)");
+}
+
+[[nodiscard]] void*
+operator new[](std::size_t size, const std::nothrow_t&) noexcept
+{
+    return HeapMemoryTracker::allocate(size, 0, "::new[](nothrow)");
 }
 
 [[nodiscard]] void*
@@ -152,3 +187,5 @@ operator delete[](void* p, std::size_t, std::align_val_t) noexcept
 {
     HeapMemoryTracker::deallocate(p, "::delete[] sized aligned");
 }
+
+#endif

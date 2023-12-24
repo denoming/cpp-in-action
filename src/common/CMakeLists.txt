@@ -21,3 +21,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET}
     PRIVATE Boost::headers
 )
+
+if(DEFAULT_ALLOCATION)
+    target_compile_definitions(${TARGET} PUBLIC -DDEFAULT_ALLOCATION=1)
+endif()
