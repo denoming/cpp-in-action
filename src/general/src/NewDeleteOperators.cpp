@@ -4,15 +4,19 @@
 #include "common/MemoryDump.hpp"
 
 #include <boost/format.hpp>
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/comparison.hpp>
-#include <boost/mpl/bitwise.hpp>
 #include <boost/mpl/arithmetic.hpp>
+#include <boost/mpl/assert.hpp>
+#include <boost/mpl/bitwise.hpp>
+#include <boost/mpl/comparison.hpp>
+#include <boost/mpl/int.hpp>
 
 #include <iostream>
 
 #include <cstring>
+
+extern "C" {
+#include <malloc.h>
+}
 
 template<std::size_t bytes>
 struct boundary {
@@ -89,6 +93,16 @@ struct boundary<0> {
 };
 
 struct Data1 {
+    Data1()
+    {
+        std::cout << "ctor: Data1" << std::endl;
+    }
+
+    ~Data1()
+    {
+        std::cout << "dtor: Data1" << std::endl;
+    }
+
     char a{0x11};
     int b{0x22222222};
     short c{0x3333};
@@ -96,11 +110,94 @@ struct Data1 {
 };
 
 struct Data2 {
-    long d{0x4444444444444444};
-    int b{0x22222222};
-    short c{0x3333};
-    char a{0x11};
+    Data2()
+    {
+        std::cout << "ctor: Data2" << std::endl;
+    }
+
+    ~Data2()
+    {
+        std::cout << "dtor: Data2" << std::endl;
+    }
+
+    long d{0x0102030405060708};
+    int b{0x11223344};
+    short c{0x5566};
+    char a{0x77};
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+
+TEST(NewDeleteOperators, LegacyAllocation)
+{
+    /* Allocate raw memory with given size */
+    int* ptr1 = static_cast<int*>(malloc(sizeof(int)));
+    *ptr1 = 7;
+    free(ptr1);
+
+    /* Allocate raw memory with given size and initialize to zero */
+    int* ptr2 = static_cast<int*>(calloc(1, sizeof(int)));
+    *ptr2 = 0x1EFEFEFE;
+
+    std::cout << "Initial mem size: " << malloc_usable_size(ptr2) << std::endl;
+    int* ptr3 = static_cast<int*>(realloc(ptr2, sizeof(int) * 10));
+    if (ptr3 == nullptr) {
+        std::cout << "Unable to realloc" << std::endl;
+        free(ptr2);
+    } else {
+        std::cout << "After realloc mem size: " << malloc_usable_size(ptr3) << std::endl;
+        free(ptr3);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+TEST(NewDeleteOperators, ModernAllocation)
+{
+    int* ptr1 = new int[5]{1, 2, 3, 4 /* the last element will have 0 value */};
+    std::cout << *ptr1 << std::endl;
+    delete[] ptr1;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static void
+onBadAllocationHandler()
+{
+    static uint32_t index{};
+    std::cout << "Unable to allocate memory: " << ++index << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds{15});
+}
+
+// Add -DDEFAULT_ALLOCATION=ON to cmake options
+TEST(NewDeleteOperators, AllocationFailure)
+{
+    std::set_new_handler(onBadAllocationHandler);
+    for (int n = 0; n < 50000; ++n) {
+        std::ignore = new int[INT32_MAX];
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+TEST(NewDeleteOperators, PlacementNew)
+{
+    /* On stack */
+    uint8_t mem1[100];
+    std::memset(mem1, 0xFF, 100); // Fill by 0xFF bytes
+    auto* pData1 = new (mem1) uint32_t[5]{0, 1, 2, 3, 4}; // NOLINT
+    MemoryDump::dump(mem1, 100);
+
+    /* On heap */
+    auto* mem2 = static_cast<uint8_t*>(operator new(100));
+    auto* pData2 = new (mem2) Data2[2]{}; // NOLINT
+    MemoryDump::dump(mem2, 100);
+    pData2[0].~Data2();
+    pData2[1].~Data2();
+    operator delete(mem2);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 TEST(NewDeleteOperators, UseOperatorsWithoutThrow)
 {
@@ -114,8 +211,11 @@ TEST(NewDeleteOperators, UseOperatorsWithoutThrow)
     HeapMemoryTracker::trace(false);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
 TEST(NewDeleteOperators, BadCaseOfAlignment)
 {
+    /* Use placement new */
     std::uint8_t memory[sizeof(Data1)];
     std::memset(memory, 0xFF, sizeof(Data1)); // Fill by 0xFF bytes
 
@@ -125,8 +225,11 @@ TEST(NewDeleteOperators, BadCaseOfAlignment)
     pData->~Data1();
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
 TEST(NewDeleteOperators, GoodCaseOfAlignment)
 {
+    /* Use placement new */
     std::uint8_t memory[sizeof(Data2)];
     std::memset(memory, 0xFF, sizeof(Data2)); // Fill by 0xFF bytes
 
@@ -135,6 +238,8 @@ TEST(NewDeleteOperators, GoodCaseOfAlignment)
     MemoryDump::dump(pData, sizeof(Data2));
     pData->~Data2();
 }
+
+//----------------------------------------------------------------------------------------------------------------------
 
 TEST(NewDeleteOperators, CustomAlignment)
 {
@@ -174,3 +279,5 @@ TEST(NewDeleteOperators, CustomAlignment)
     // Free allocated memory
     std::free(memory);
 }
+
+//----------------------------------------------------------------------------------------------------------------------
