@@ -38,6 +38,7 @@ PRIVATE
     src/Span.cpp
     src/Bits.cpp
     src/Chrono.cpp
+    src/Formatting.cpp
 )
 
 target_link_libraries(${TARGET}
