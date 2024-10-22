@@ -18,7 +18,7 @@ PRIVATE
     src/StructuredBinding.cpp
     src/TemplateClassDeduction.cpp
     src/Variant.cpp
-    src/StringSearch.cpp
+    src/String.cpp
     src/UtilityFunctions.cpp
     src/ContainerImprovements.cpp
     src/UncaughtException.cpp

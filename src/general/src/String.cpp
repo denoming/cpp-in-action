@@ -1,8 +1,52 @@
 #include <gtest/gtest.h>
 
 #include <functional>
+#include <sstream>
+#include <spanstream>
+#include <string>
 
-TEST(StringSearchTest, BoyerMooreSearcherForString)
+TEST(String, Contains)
+{
+    const std::string url = "https://isocpp.org";
+
+    EXPECT_TRUE(url.contains("https"));
+    EXPECT_TRUE(url.contains(".org"));
+    EXPECT_FALSE(url.contains(".com"));
+}
+
+TEST(String, StartEndWith)
+{
+    const std::string url = "https://isocpp.org";
+
+    EXPECT_TRUE(url.starts_with("https") and url.ends_with(".org"));
+}
+
+TEST(String, Stream)
+{
+    // Use rvalue ctor
+    std::stringstream ss{std::string{" SOME ALREADY ALLOCATED BIG STRING "}};
+    ss << "I'm Denys";
+
+    // Use .view() instead of .str() to avoid copying internal string
+    EXPECT_TRUE(ss.view().starts_with("I'm Denys"));
+}
+
+TEST(String, SpanStream)
+{
+    // Allocate buffer and span to use for placing a string
+    char buffer[128] { 0 };
+    std::span<char> sb(buffer);
+
+    // Declare span stream to use previously allocated buffer
+    std::spanstream ss{sb};
+    ss << "one string that doesn't fit into SSO";
+
+    // Check the value
+    std::string_view view{buffer};
+    EXPECT_EQ(view, "one string that doesn't fit into SSO");
+}
+
+TEST(String, BoyerMooreSearcherForString)
 {
     const std::string source = R"(Lorem ipsum dolor sit amet, consectetur adipiscing elit,
  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
@@ -24,7 +68,7 @@ TEST(StringSearchTest, BoyerMooreSearcherForString)
     }
 }
 
-TEST(StringSearchTest, BoyerMooreSearcherForData)
+TEST(String, BoyerMooreSearcherForData)
 {
     std::vector<int> source = {1, 3, 4, 0, 6, 1, 7, 5, 0, 6, 2};
     std::vector<int> target = {0, 6};
