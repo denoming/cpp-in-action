@@ -39,6 +39,7 @@ PRIVATE
     src/Bits.cpp
     src/Chrono.cpp
     src/Formatting.cpp
+    src/Tuples.cpp
 )
 
 target_link_libraries(${TARGET}
