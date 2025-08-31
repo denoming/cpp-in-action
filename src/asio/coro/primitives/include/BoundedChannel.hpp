@@ -48,7 +48,7 @@ public:
             if (ec) {
                 co_return Result{.error = ec, .size = wasSent};
             }
-            const T* ptr = io::buffer_cast<const T*>(buffer);
+            const T* ptr = static_cast<const T*>(buffer.data());
             const size_t size = std::min(_container.capacity() - _container.size(), needSend);
             _container.insert(std::end(_container), ptr, ptr + size);
             buffer += size;
@@ -70,7 +70,7 @@ public:
             if (ec) {
                 co_return Result{.error = ec, .size = wasRecv};
             }
-            T* ptr = io::buffer_cast<T*>(buffer);
+            T* ptr = static_cast<T*>(buffer.data());
             const size_t size = std::min(_container.size(), needRecv);
             std::copy(std::begin(_container), std::begin(_container) + size, ptr);
             _container.erase_begin(size);
