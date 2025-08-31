@@ -9,11 +9,12 @@
     "boost-program-options",
     "boost-circular-buffer",
     "boost-mpl",
+    "boost-coroutine",
     "boost-format",
     "tbb",
-    "fmt",
     "gtest",
     "libevent",
-    "spdlog"
+    "spdlog",
+    "gtest"
   ]
 }
