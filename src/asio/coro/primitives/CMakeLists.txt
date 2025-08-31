@@ -16,7 +16,7 @@ target_include_directories(${TARGET}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
 
-if (DEBUG)
+if(DEBUG)
     target_compile_definitions(${TARGET}
         PRIVATE -DDEBUG
     )
@@ -27,5 +27,8 @@ target_link_libraries(${TARGET}
             spdlog::spdlog
             GTest::gtest_main
             GTest::gmock_main
-            ThreadSanitizer
 )
+
+if(ENABLE_THREAD_SANITIZER)
+    target_link_libraries(${TARGET} PRIVATE ThreadSanitizer)
+endif()
