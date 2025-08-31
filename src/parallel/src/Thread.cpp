@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <random>
-#include <list>
 #include <future>
-#include <thread>
-#include <syncstream>
 #include <iostream>
+#include <list>
+#include <random>
+#include <syncstream>
+#include <thread>
 
 using namespace std::literals;
 
@@ -110,23 +110,30 @@ using Callback = std::stop_callback<Handler>;
 static void
 fn4(std::stop_token stoken, const std::string& name)
 {
-    std::list<Callback> callbacks;
-    for (int i = 0; i < 5; ++i) {
-        /* Registers callback (each of them will be invoked)*/
-        callbacks.emplace_back(
-            stoken, [=]() { std::cout << "Hi from " << name << " thread: (" << i << ")\n"; });
+    int counter{};
+
+    std::stop_callback callback(stoken, [name, id = std::this_thread::get_id(), &counter]() {
+        std::cout << "Thread '" << name << "' (" << id << "), counter = " << counter << std::endl;
+    });
+
+    while (counter < 5) {
+        std::this_thread::sleep_for(0.2s);
+        ++counter;
     }
-    std::this_thread::sleep_for(0.1s);
-    std::cout << '\n';
 }
 
 TEST(Thread, StopCallback)
 {
     std::jthread t1{&fn4, "T1"};
     std::jthread t2{&fn4, "T2"};
-    std::this_thread::sleep_for(0.2s);
-    /* Requests to stop (each registered callback will be invoked) */
-    t1.request_stop(), t2.request_stop();
+    std::jthread t3{&fn4, "T3"};
+
+    std::this_thread::sleep_for(1s);
+
+    /* Requests to stop each thread (registered callback will be invoked) */
+    t1.request_stop(), t2.request_stop(), t3.request_stop();
+
+    std::this_thread::sleep_for(1s);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -152,22 +159,23 @@ TEST(Thread, CooperativeInteraption)
     std::jthread t1{&fn5, ss.get_token() /* Provide stop token */, "T1"};
     std::jthread t2{&fn5, ss.get_token() /* Provide stop token */, "T2"};
 
-    [[maybe_unused]] auto f1 = std::async(std::launch::async, [stoken = ss.get_token() /* Provide stop token */]() {
-        std::osyncstream scout{std::cout};
-        while (true) {
-            scout << "Tick: (async)" << std::endl;
-            if (stoken.stop_requested()) {
-                scout << "Exit: (async) " << std::endl;
-                break;
-            }
-            std::this_thread::sleep_for(0.1s);
-        }
-    });
+    [[maybe_unused]] auto f1
+        = std::async(std::launch::async, [stoken = ss.get_token() /* Provide stop token */]() {
+              std::osyncstream scout{std::cout};
+              while (true) {
+                  scout << "Tick: (async)" << std::endl;
+                  if (stoken.stop_requested()) {
+                      scout << "Exit: (async) " << std::endl;
+                      break;
+                  }
+                  std::this_thread::sleep_for(0.1s);
+              }
+          });
 
     std::this_thread::sleep_for(1s);
 
     /* Request to stop T1, T2 and async call */
-    ss.request_stop();
+    std::ignore = ss.request_stop();
 }
 
 //--------------------------------------------------------------------------------------------------
