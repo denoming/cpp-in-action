@@ -1,7 +1,8 @@
 #include "TcpSession.hpp"
 
-#include <iostream>
+#include <boost/current_function.hpp>
 
+#include <iostream>
 #include <ctime>
 
 namespace {

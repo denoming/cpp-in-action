@@ -2,6 +2,8 @@
 
 #include "TcpSession.hpp"
 
+#include <boost/current_function.hpp>
+
 TcpServer::TcpServer(asio::io_context& context, std::uint16_t port)
     : _context{context}
     , _acceptor{context, tcp::endpoint{tcp::v4(), port}}
